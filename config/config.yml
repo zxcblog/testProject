@@ -1,0 +1,11 @@
+service:
+  port: :19511
+  debug_mode: false
+  max_page_size: 100
+  min_page_size: 1
+
+logger:
+  debug_file: /log/debug
+  access_file: /log/access
+  max_size: 5
+  max_age: 30
