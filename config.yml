@@ -1,0 +1,24 @@
+Service:
+  Port: :19610
+  DebugMode: false
+  MaxPageSize: 100
+  MinPageSize: 1
+
+Logger:
+  DebugFile: /log/debug
+  AccessFile: /log/access
+  MaxSize: 5
+  MaxAge: 30
+
+DB:
+  DBType: mysql
+  Username: root
+  Password: 123456
+  Host: 127.0.0.1
+  Port: 3306
+  DBName: shop
+  TablePrefix: shop_
+  Charset: utf8mb4
+  ParseTime: true
+  MaxIdleConns: 10
+  MaxOpenConns: 30
