@@ -11,6 +11,7 @@ type Service struct {
 	MaxPageSize int    `yaml:"MaxPageSize"`
 	MinPageSize int    `yaml:"MinPageSize"`
 	Port        string `yaml:"Port"`
+	Host        string `yaml:"Host"`
 }
 
 type Logger struct {

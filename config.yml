@@ -1,8 +1,9 @@
 Service:
   Port: :19610
-  DebugMode: false
+  DebugMode: true
   MaxPageSize: 100
   MinPageSize: 1
+  Host: http://localhost:19610
 
 Logger:
   DebugFile: /log/debug
