@@ -11,7 +11,7 @@ import (
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/schema"
-	config2 "new-chat/pkg/config"
+	config2 "new-project/pkg/config"
 )
 
 type Model struct {

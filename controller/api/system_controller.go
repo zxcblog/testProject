@@ -2,7 +2,7 @@ package api
 
 import (
 	"github.com/kataras/iris/v12"
-	"new-chat/pkg/app"
+	"new-project/pkg/app"
 )
 
 type SystemController struct {

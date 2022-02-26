@@ -1,4 +1,4 @@
-module new-chat
+module new-project
 
 go 1.17
 

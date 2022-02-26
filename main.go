@@ -1,11 +1,11 @@
 package main
 
 import (
-	"new-chat/controller"
-	"new-chat/global"
-	"new-chat/models"
-	config2 "new-chat/pkg/config"
-	"new-chat/pkg/logger"
+	"new-project/controller"
+	"new-project/global"
+	"new-project/models"
+	config2 "new-project/pkg/config"
+	"new-project/pkg/logger"
 )
 
 // @title 测试商城项目

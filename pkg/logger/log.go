@@ -5,7 +5,7 @@ import (
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"io"
-	"new-chat/pkg/config"
+	"new-project/pkg/config"
 )
 
 func NewLogger(log config.Logger) *zap.Logger {

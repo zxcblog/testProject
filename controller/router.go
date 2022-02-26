@@ -6,9 +6,9 @@ import (
 	"github.com/iris-contrib/swagger/v12/swaggerFiles"
 	"github.com/kataras/iris/v12"
 	"github.com/kataras/iris/v12/mvc"
-	"new-chat/controller/api"
-	_ "new-chat/docs"
-	"new-chat/pkg/config"
+	"new-project/controller/api"
+	_ "new-project/docs"
+	"new-project/pkg/config"
 
 	"github.com/iris-contrib/middleware/cors"
 )

@@ -8,7 +8,7 @@ package repositories
 
 import (
 	"gorm.io/gorm"
-	"new-chat/models"
+	"new-project/models"
 )
 
 type IPorduct interface {
