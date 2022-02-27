@@ -6,6 +6,7 @@ import (
 	"github.com/iris-contrib/swagger/v12/swaggerFiles"
 	"github.com/kataras/iris/v12"
 	"github.com/kataras/iris/v12/mvc"
+	"new-project/controller/admin"
 	"new-project/controller/api"
 	_ "new-project/docs"
 	"new-project/pkg/config"
@@ -35,6 +36,11 @@ func Router() {
 	// 系统路由
 	mvc.Configure(app.Party("/api"), func(m *mvc.Application) {
 		m.Party("/system").Handle(new(api.SystemController))
+	})
+
+	// 管理员操作
+	mvc.Configure(app.Party("/admin"), func(m *mvc.Application) {
+		m.Party("/category").Handle(new(admin.CategoryController))
 	})
 
 	// iris.WithoutServerError(iris.ErrServerClosed) 忽略iris框架服务启动时的Listen的错误

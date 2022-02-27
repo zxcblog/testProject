@@ -31,6 +31,7 @@ func NewDBEngine(config config2.Database, models ...interface{}) (*gorm.DB, erro
 			TablePrefix:   config.TablePrefix, // 表前缀
 			SingularTable: true,               // 使用单表复数名
 		},
+		DisableForeignKeyConstraintWhenMigrating: true, // 禁用外键约束
 	})
 	if err != nil {
 		return nil, err
@@ -44,7 +45,7 @@ func NewDBEngine(config config2.Database, models ...interface{}) (*gorm.DB, erro
 	sqlDB.SetMaxIdleConns(config.MaxIdleConns) // SetMaxIdleConns 设置空闲连接池中连接的最大数量
 	sqlDB.SetMaxOpenConns(config.MaxOpenConns) // SetMaxOpenConns 设置打开数据库连接的最大数量。
 
-	if err = db.AutoMigrate(models...); err != nil {
+	if err = db.Set("gorm:table_options", "ENGINE=InnoDB").AutoMigrate(models...); err != nil {
 		return nil, fmt.Errorf("自动化生成表失败：%s", err.Error())
 	}
 
