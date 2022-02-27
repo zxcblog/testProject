@@ -4,6 +4,7 @@ import (
 	"new-project/controller"
 	"new-project/global"
 	"new-project/models"
+	"new-project/pkg/app"
 	config2 "new-project/pkg/config"
 	"new-project/pkg/logger"
 )
@@ -28,6 +29,9 @@ func main() {
 	if global.DB, err = models.NewDBEngine(config2.GetDB(), models.Models...); err != nil {
 		panic(err)
 	}
+
+	// 加载参数验证器
+	global.Validate = app.NewTranslationIns(app.WithLabelOption("label"), app.WithRulesOption(&app.Rules), app.WithRulesMsgOption(&app.RulesMsg))
 
 	controller.Router()
 }

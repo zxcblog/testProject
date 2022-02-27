@@ -10,8 +10,10 @@ import (
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 	"io"
+	"new-project/pkg/app"
 )
 
 var AccessLog io.Writer
 var Logger *zap.Logger
 var DB *gorm.DB
+var Validate *app.Translations
