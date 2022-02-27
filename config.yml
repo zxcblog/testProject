@@ -6,8 +6,8 @@ Service:
   Host: http://localhost:19610
 
 Logger:
-  DebugFile: /log/debug
-  AccessFile: /log/access
+  DebugFile: log/debug/debug.log
+  AccessFile: log/access/access.log
   MaxSize: 5
   MaxAge: 30
 

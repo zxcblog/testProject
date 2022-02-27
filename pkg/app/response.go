@@ -1,5 +1,7 @@
 package app
 
+import "new-project/pkg/errcode"
+
 type Result map[string]interface{}
 
 type Response struct {
@@ -27,7 +29,11 @@ func ToResponse(msg string, data interface{}) *Response {
 		data = Result{}
 	}
 
-	return &Response{Code: 0, Data: data, Msg: msg}
+	if msg == "" {
+		msg = errcode.Success.Msg()
+	}
+
+	return &Response{Code: errcode.Success.Code(), Data: data, Msg: msg}
 }
 
 func ToResponseList(list interface{}, totalRows int) *Response {
@@ -37,10 +43,15 @@ func ToResponseList(list interface{}, totalRows int) *Response {
 	})
 }
 
+func ResponseErrMsg(msg string) *Response {
+	return ToResponseErr(errcode.RequestError.SetMsh(msg))
+}
+
 func ToResponseErr(err error) *Response {
-	return &Response{
-		//	Code: err,
-		//	Data: nil,
-		//	Msg:  err.Error(),
+	errResponse := &Response{Data: nil, Msg: err.Error()}
+	if errCodeErr, ok := err.(*errcode.Error); ok {
+		errResponse.Code = errCodeErr.Code()
 	}
+
+	return errResponse
 }

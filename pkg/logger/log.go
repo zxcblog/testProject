@@ -4,7 +4,6 @@ import (
 	"github.com/natefinch/lumberjack"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
-	"io"
 	"new-project/pkg/config"
 )
 
@@ -12,13 +11,8 @@ func NewLogger(log config.Logger) *zap.Logger {
 	return InitLogger(log.DebugFile, log.MaxSize, log.MaxAge, zap.ErrorLevel)
 }
 
-func NewAccessLogger(log config.Logger) io.Writer {
-	return &lumberjack.Logger{
-		Filename:  log.AccessFile, // 日志文件位置
-		MaxSize:   log.MaxSize,    // 日志文件的最大大小（MB）
-		MaxAge:    log.MaxAge,     // 保留旧文件的最大天数
-		LocalTime: true,
-	}
+func NewAccessLogger(log config.Logger) *zap.Logger {
+	return InitLogger(log.AccessFile, log.MaxSize, log.MaxAge, zap.InfoLevel)
 }
 
 func InitLogger(filepath string, maxSize, maxAge int, level zapcore.Level) *zap.Logger {

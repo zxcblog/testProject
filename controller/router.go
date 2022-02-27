@@ -9,6 +9,7 @@ import (
 	"new-project/controller/admin"
 	"new-project/controller/api"
 	_ "new-project/docs"
+	"new-project/middleware"
 	"new-project/pkg/config"
 
 	"github.com/iris-contrib/middleware/cors"
@@ -32,6 +33,8 @@ func Router() {
 		app.Get("/swagger/{any:path}", swaggerUI)
 		app.Get("/swagger", swaggerUI)
 	}
+
+	app.Use(middleware.AccessLog)
 
 	// 系统路由
 	mvc.Configure(app.Party("/api"), func(m *mvc.Application) {
