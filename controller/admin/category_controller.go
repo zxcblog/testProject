@@ -7,38 +7,79 @@
 package admin
 
 import (
-	"fmt"
 	"github.com/kataras/iris/v12"
+	"new-project/controller/render"
 	"new-project/global"
+	"new-project/models"
 	"new-project/pkg/app"
+	"new-project/services"
 )
 
 type CategoryController struct {
 	Ctx iris.Context
 }
 
-// 创建分类
+// CategoryControllerPost 创建分类
 type CategoryControllerPost struct {
 	CategoryName string `validate:"required,min=1,max=20" label:"分类名称" json:"categoryName"` // 分类名称
+	CategoryImg  string `validate:"-" label:"分类图片" json:"categoryImg" default:""`           // 分类图片地址链接
 	CategoryID   uint   `validate:"-" label:"所属分类" json:"categoryID" default:"0"`           // 所属分类
+	Sort         uint   `validate:"min=0,max=100" label:"排序" json:"sort" default:"0"`       //排序
 	IsFinal      bool   `validate:"-" label:"是否为最终类" json:"isFinal"  default:"false"`       // 是否为最终类
 }
 
+// Post 添加商品分类
 // @Summary 添加商品分类
 // @Description 后台管理人员添加商品分类
 // @Accept json
 // @Produce json
 // @param root body CategoryControllerPost true "添加商品分类"
 // @Tags 商品分类
-// @Success 200 {object} app.Response
+// @Success 200 {object} app.Response{data=render.Category}
 // @Router /admin/category [post]
 func (c *CategoryController) Post() *app.Response {
 	param := &CategoryControllerPost{}
 	err := c.Ctx.ReadJSON(param)
-	fmt.Println("打印接收值", param, err)
+	if err != nil {
+		return app.ResponseErrMsg(err.Error())
+	}
 
+	// 验证参数是否正确
 	err = global.Validate.ValidateParam(param)
-	fmt.Println(err)
+	if err != nil {
+		return app.ResponseMsg(err.Error())
+	}
 
-	return app.ResponseMsg("创建成功")
+	category := &models.Category{
+		CategoryName: param.CategoryName,
+		CategoryImg:  param.CategoryImg,
+		IsFinal:      param.IsFinal,
+		Sort:         param.Sort,
+		CategoryID:   param.CategoryID,
+	}
+
+	if err = services.CategoryService.Create(category); err != nil {
+		return app.ToResponseErr(err)
+	}
+
+	return app.ResponseData(render.BuildCreategory(category))
+}
+
+// Get 根据分类id获取子集分类
+// @Summary 获取子分类列表
+// @Description 根据分类id获取子分类列表
+// @Produce json
+// @param categoryID query uint false "分类id" default(0)
+// @param page query uint false "分页" default(1)
+// @param pageSize query uint false "分页页数" default(10)
+// @Tags 商品分类
+// @Success 200 {object} app.Response{data=[]render.Category}
+// @Router /admin/category [get]
+func (c *CategoryController) Get() *app.Response {
+	categoryID := app.FormValueUintDefault(c.Ctx, "categoryID", 0)
+	page := app.GetPage(c.Ctx)
+	pageSize := app.GetPageSize(c.Ctx)
+	list, total := services.CategoryService.GetListPage(global.DB.Where("category_id", categoryID), page, pageSize)
+
+	return app.ToResponseList(render.BuildCreategories(list), total)
 }
