@@ -38,10 +38,6 @@ func AccessLog(ctx iris.Context) {
 	ctx.Next()
 	endTime := time.Now()
 
-	//后期用来记录返回的数据中的堆栈记录信息
-	//res := &app.Response{}
-	//json.Unmarshal(ctx.Recorder().Body(), res)
-
 	// 记录访问日志
 	global.AccessLog.Sugar().Infof(`
 %s - - [%s %dμs] "%s %s %s" %d
@@ -49,7 +45,7 @@ Request Header Token: %s
 Request Header User-Agent: %s 
 Request Body: %s 
 Response Body: %s`,
-		ctx.RemoteAddr(), startTime.Format("2016-01-02 15:04:05"), endTime.Sub(startTime).Microseconds(), method, path,
+		ctx.RemoteAddr(), startTime.Format("2006-01-02 15:04:05"), endTime.Sub(startTime).Microseconds(), method, path,
 		ctx.Request().Proto, ctx.ResponseWriter().StatusCode(),
 		ctx.Request().Header.Get("token"), ctx.Request().Header.Get("User-Agent"),
 		params, reg.ReplaceAll(ctx.Recorder().Body(), []byte("")),

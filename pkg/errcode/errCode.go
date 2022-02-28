@@ -30,7 +30,7 @@ func (e *Error) Error() string {
 	return e.Msg()
 }
 
-func (e *Error) SetMsh(msg string) *Error {
+func (e *Error) SetMsg(msg string) *Error {
 	newErr := *e
 	newErr.msg = msg
 	return &newErr

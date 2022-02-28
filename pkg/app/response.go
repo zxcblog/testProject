@@ -10,12 +10,6 @@ type Response struct {
 	Msg  string      `json:"msg"`
 }
 
-type Pager struct {
-	Page      int `json:"page"`
-	PageSize  int `json:"page_size"`
-	TotalRows int `json:"total_rows"`
-}
-
 func ResponseMsg(msg string) *Response {
 	return ToResponse(msg, nil)
 }
@@ -36,7 +30,7 @@ func ToResponse(msg string, data interface{}) *Response {
 	return &Response{Code: errcode.Success.Code(), Data: data, Msg: msg}
 }
 
-func ToResponseList(list interface{}, totalRows int) *Response {
+func ToResponseList(list interface{}, totalRows int64) *Response {
 	return ToResponse("", Result{
 		"list":       list,
 		"total_rows": totalRows,
@@ -44,7 +38,7 @@ func ToResponseList(list interface{}, totalRows int) *Response {
 }
 
 func ResponseErrMsg(msg string) *Response {
-	return ToResponseErr(errcode.RequestError.SetMsh(msg))
+	return ToResponseErr(errcode.RequestError.SetMsg(msg))
 }
 
 func ToResponseErr(err error) *Response {
