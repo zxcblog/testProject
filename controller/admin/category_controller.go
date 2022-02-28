@@ -12,6 +12,7 @@ import (
 	"new-project/global"
 	"new-project/models"
 	"new-project/pkg/app"
+	"new-project/pkg/errcode"
 	"new-project/services"
 )
 
@@ -61,7 +62,6 @@ func (c *CategoryController) Post() *app.Response {
 	if err = services.CategoryService.Create(category); err != nil {
 		return app.ToResponseErr(err)
 	}
-
 	return app.ResponseData(render.BuildCreategory(category))
 }
 
@@ -82,4 +82,54 @@ func (c *CategoryController) Get() *app.Response {
 	list, total := services.CategoryService.GetListPage(global.DB.Where("category_id", categoryID), page, pageSize)
 
 	return app.ToResponseList(render.BuildCreategories(list), total)
+}
+
+// GetBy 通过id获取分类信息
+// @Summary 获取分类详情
+// @Description 通过分类id获取分类详情
+// @Produce json
+// @param categoryID path uint true "分类id"
+// @tags 商品分类
+// @Success 200 {object} app.Response{data=render.Category}
+// @Router /admin/category/{categoryID} [get]
+func (c *CategoryController) GetBy(id uint) *app.Response {
+	res := services.CategoryService.Get(id)
+
+	if res == nil {
+		return app.ToResponseErr(errcode.NotFound)
+	}
+	return app.ResponseData(render.BuildCreategory(res))
+}
+
+// CategoryControllerPut 修改分类
+type CategoryControllerPut struct {
+	IsFinal      bool   `validate:"-" label:"是否为最终类" json:"isFinal"  default:"false"` // 是否为最终类
+	ID           uint   `validate:"required" label:"分类ID" json:"id"`                  // 分类ID
+	CategoryID   uint   `validate:"-" label:"所属分类" json:"categoryID" default:"0"`     // 所属分类
+	Sort         uint   `validate:"min=0,max=100" label:"排序" json:"sort" default:"0"` //排序
+	CategoryImg  string `validate:"-" label:"分类图片" json:"categoryImg" default:""`     // 分类图片地址链接
+	CategoryName string `validate:"min=1,max=20" label:"分类名称" json:"categoryName"`    // 分类名称
+}
+
+// Put 修改分类信息
+// @Summary 修改分类信息
+// @Description 修改分类信息
+// @Accept json
+// @Produce json
+// @param root body CategoryControllerPut true "修改商品分类"
+// @Tags 商品分类
+// @Success 200 {object} app.Response{data=render.Category}
+// @Router /admin/category [put]
+func (c *CategoryController) Put() *app.Response {
+	param := &CategoryControllerPut{}
+	err := c.Ctx.ReadJSON(param)
+	if err != nil {
+		return app.ToResponseErr(errcode.RequestError.SetMsg(err.Error()))
+	}
+	err = global.Validate.ValidateParam(param)
+	if err != nil {
+		return app.ToResponseErr(errcode.InvalidParams.SetMsg(err.Error()))
+	}
+
+	return app.ResponseData(param)
 }

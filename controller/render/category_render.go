@@ -12,17 +12,17 @@ import (
 )
 
 type Category struct {
-	ID           uint           `json:"id,omitempty" example:"1"`
-	CreatedAt    uint32         `json:"createdAt,omitempty" example:"1646036184"`
-	UpdatedAt    uint32         `json:"updatedAt,omitempty" example:"1646036184"`
-	DeletedAt    gorm.DeletedAt `json:"deletedAt,omitempty" swaggertype:"string" example:"2022-02-01 16:51:21"`
-	Path         string         `json:"path,omitempty" example:"-"`
-	CategoryName string         `json:"categoryName,omitempty" example:"一级分类"`
-	CategoryImg  string         `json:"categoryImg,omitempty" example:"http://test/image/1.jpg"`
-	IsFinal      bool           `json:"isFinal,omitempty" example:"false"`
-	Sort         uint           `json:"sort,omitempty" example:"0"`
-	CategoryID   uint           `json:"categoryID,omitempty" example:"0"`
-	Level        uint           `json:"level,omitempty" example:"1"`
+	ID           uint           `json:"id" example:"1"`
+	CreatedAt    uint32         `json:"createdAt" example:"1646036184"`
+	UpdatedAt    uint32         `json:"updatedAt" example:"1646036184"`
+	DeletedAt    gorm.DeletedAt `json:"deletedAt" swaggertype:"string" example:"2022-02-01 16:51:21"`
+	Path         string         `json:"path" example:"-"`
+	CategoryName string         `json:"categoryName" example:"一级分类"`
+	CategoryImg  string         `json:"categoryImg" example:"http://test/image/1.jpg"`
+	IsFinal      bool           `json:"isFinal" example:"false"`
+	Sort         uint           `json:"sort" example:"0"`
+	CategoryID   uint           `json:"categoryID" example:"0"`
+	Level        uint           `json:"level" example:"1"`
 }
 
 func BuildCreategory(category *models.Category) *Category {

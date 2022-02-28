@@ -6,6 +6,7 @@ import (
 	"github.com/iris-contrib/swagger/v12/swaggerFiles"
 	"github.com/kataras/iris/v12"
 	"github.com/kataras/iris/v12/mvc"
+	"net/http"
 	"new-project/controller/admin"
 	"new-project/controller/api"
 	_ "new-project/docs"
@@ -20,6 +21,7 @@ func Router() {
 	app.Use(cors.New(cors.Options{
 		AllowedOrigins:   []string{"*"},
 		AllowCredentials: true,
+		AllowedMethods:   []string{http.MethodGet, http.MethodPost, http.MethodPut, http.MethodDelete},
 		Debug:            config.GetService().DebugMode,
 	}))
 

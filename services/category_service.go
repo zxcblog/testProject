@@ -24,6 +24,16 @@ func NewCategoryService() *categoryService {
 	return &categoryService{}
 }
 
+// Get 获取分类信息
+func (c *categoryService) Get(id uint) *models.Category {
+	return repositories.CategoryRepositories.Get(global.DB, id)
+}
+
+// GetListPage 获取分类列表
+func (c *categoryService) GetListPage(db *gorm.DB, page, pageSize int) ([]*models.Category, int64) {
+	return repositories.CategoryRepositories.GetList(db, page, pageSize)
+}
+
 // Create 创建分类
 func (c *categoryService) Create(category *models.Category) error {
 	if category.CategoryID != 0 {
@@ -48,8 +58,4 @@ func (c *categoryService) Create(category *models.Category) error {
 	}
 
 	return nil
-}
-
-func (c *categoryService) GetListPage(db *gorm.DB, page, pageSize int) ([]*models.Category, int64) {
-	return repositories.CategoryRepositories.GetList(db, page, pageSize)
 }
