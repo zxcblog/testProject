@@ -20,8 +20,8 @@ type CategoryController struct {
 	Ctx iris.Context
 }
 
-// CategoryControllerPost 创建分类
-type CategoryControllerPost struct {
+// CategoryRequest 创建分类
+type CategoryRequest struct {
 	CategoryName string `validate:"required,min=1,max=20" label:"分类名称" json:"categoryName"` // 分类名称
 	CategoryImg  string `validate:"-" label:"分类图片" json:"categoryImg" default:""`           // 分类图片地址链接
 	CategoryID   uint   `validate:"-" label:"所属分类" json:"categoryID" default:"0"`           // 所属分类
@@ -34,12 +34,12 @@ type CategoryControllerPost struct {
 // @Description 后台管理人员添加商品分类
 // @Accept json
 // @Produce json
-// @param root body CategoryControllerPost true "添加商品分类"
+// @param root body CategoryRequest true "添加商品分类"
 // @Tags 商品分类
 // @Success 200 {object} app.Response{data=render.Category}
 // @Router /admin/category [post]
 func (c *CategoryController) Post() *app.Response {
-	param := &CategoryControllerPost{}
+	param := &CategoryRequest{}
 	err := c.Ctx.ReadJSON(param)
 	if err != nil {
 		return app.ResponseErrMsg(err.Error())
@@ -48,7 +48,7 @@ func (c *CategoryController) Post() *app.Response {
 	// 验证参数是否正确
 	err = global.Validate.ValidateParam(param)
 	if err != nil {
-		return app.ResponseMsg(err.Error())
+		return app.ToResponseErr(errcode.InvalidParams.SetMsg(err.Error()))
 	}
 
 	category := &models.Category{
@@ -101,35 +101,57 @@ func (c *CategoryController) GetBy(id uint) *app.Response {
 	return app.ResponseData(render.BuildCreategory(res))
 }
 
-// CategoryControllerPut 修改分类
-type CategoryControllerPut struct {
-	IsFinal      bool   `validate:"-" label:"是否为最终类" json:"isFinal"  default:"false"` // 是否为最终类
-	ID           uint   `validate:"required" label:"分类ID" json:"id"`                  // 分类ID
-	CategoryID   uint   `validate:"-" label:"所属分类" json:"categoryID" default:"0"`     // 所属分类
-	Sort         uint   `validate:"min=0,max=100" label:"排序" json:"sort" default:"0"` //排序
-	CategoryImg  string `validate:"-" label:"分类图片" json:"categoryImg" default:""`     // 分类图片地址链接
-	CategoryName string `validate:"min=1,max=20" label:"分类名称" json:"categoryName"`    // 分类名称
-}
-
-// Put 修改分类信息
+// PutBy 修改分类信息
 // @Summary 修改分类信息
 // @Description 修改分类信息
 // @Accept json
 // @Produce json
-// @param root body CategoryControllerPut true "修改商品分类"
+// @param categoryID path uint true "分类ID"
+// @param root body CategoryRequest true "修改商品分类"
 // @Tags 商品分类
 // @Success 200 {object} app.Response{data=render.Category}
-// @Router /admin/category [put]
-func (c *CategoryController) Put() *app.Response {
-	param := &CategoryControllerPut{}
+// @Router /admin/category/{categoryID} [put]
+func (c *CategoryController) PutBy(id uint) *app.Response {
+	category := services.CategoryService.Get(id)
+	if category == nil {
+		return app.ToResponseErr(errcode.NotFound)
+	}
+
+	param := &CategoryRequest{}
 	err := c.Ctx.ReadJSON(param)
 	if err != nil {
-		return app.ToResponseErr(errcode.RequestError.SetMsg(err.Error()))
+		return app.ResponseErrMsg(err.Error())
 	}
+
 	err = global.Validate.ValidateParam(param)
 	if err != nil {
 		return app.ToResponseErr(errcode.InvalidParams.SetMsg(err.Error()))
 	}
 
-	return app.ResponseData(param)
+	category.CategoryName = param.CategoryName
+	category.CategoryImg = param.CategoryImg
+	category.CategoryID = param.CategoryID
+	category.Sort = param.Sort
+	category.IsFinal = param.IsFinal
+
+	if err := services.CategoryService.Update(category); err != nil {
+		return app.ToResponseErr(err)
+	}
+
+	return app.ResponseMsg("param")
+}
+
+// DeleteBy 删除分类信息
+// @Summary 删除分类信息
+// @Description 删除分类信息
+// @Produce json
+// @param categoryID path uint true "分类ID"
+// @Tags 商品分类
+// @Success 200 {object} app.Response{data=render.Category}
+// @Router /admin/category/{categoryID} [delete]
+func (c *CategoryController) DeleteBy(id uint) *app.Response {
+	if err := services.CategoryService.Delete(id); err != nil {
+		return app.ToResponseErr(err)
+	}
+	return app.ResponseMsg("")
 }

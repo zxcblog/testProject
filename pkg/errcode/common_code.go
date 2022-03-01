@@ -14,8 +14,9 @@ var (
 	RequestError              = NewError(1009, "普通请求失败")
 
 	// 数据库错误使用2开头
-	SelectError = NewError(2001, "查找失败")
-	CreateError = NewError(2002, "创建失败")
-	UpdateError = NewError(2003, "修改失败")
-	DelError    = NewError(2004, "删除失败")
+	SelectError      = NewError(2001, "查找失败")
+	CreateError      = NewError(2002, "创建失败")
+	UpdateError      = NewError(2003, "修改失败")
+	DelError         = NewError(2004, "删除失败")
+	TransactionError = NewError(2005, "事务操作失败")
 )
