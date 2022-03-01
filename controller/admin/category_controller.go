@@ -26,7 +26,6 @@ type CategoryRequest struct {
 	CategoryImg  string `validate:"-" label:"分类图片" json:"categoryImg" default:""`           // 分类图片地址链接
 	CategoryID   uint   `validate:"-" label:"所属分类" json:"categoryID" default:"0"`           // 所属分类
 	Sort         uint   `validate:"min=0,max=100" label:"排序" json:"sort" default:"0"`       //排序
-	IsFinal      bool   `validate:"-" label:"是否为最终类" json:"isFinal"  default:"false"`       // 是否为最终类
 }
 
 // Post 添加商品分类
@@ -54,7 +53,6 @@ func (c *CategoryController) Post() *app.Response {
 	category := &models.Category{
 		CategoryName: param.CategoryName,
 		CategoryImg:  param.CategoryImg,
-		IsFinal:      param.IsFinal,
 		Sort:         param.Sort,
 		CategoryID:   param.CategoryID,
 	}
@@ -132,7 +130,6 @@ func (c *CategoryController) PutBy(id uint) *app.Response {
 	category.CategoryImg = param.CategoryImg
 	category.CategoryID = param.CategoryID
 	category.Sort = param.Sort
-	category.IsFinal = param.IsFinal
 
 	if err := services.CategoryService.Update(category); err != nil {
 		return app.ToResponseErr(err)
@@ -154,4 +151,36 @@ func (c *CategoryController) DeleteBy(id uint) *app.Response {
 		return app.ToResponseErr(err)
 	}
 	return app.ResponseMsg("")
+}
+
+type CategoryQueryName struct {
+	CategoryName string `validate:"required,min=1,max=20" label:"分类名称" json:"categoryName"` // 分类名称
+}
+
+// PostQueryName 通过分类名称查询
+// @Summary 分类名称搜索
+// @Description 通过分类名称搜索可绑定的分类信息
+// @Produce json
+// @Param root body CategoryQueryName true "分类名称"
+// @Tags 商品分类
+// @Success 200 {object} app.Response{data=[]render.Category}
+// @Router /admin/category/query/name [get]
+func (c *CategoryController) PostQueryName() *app.Response {
+	param := &CategoryQueryName{}
+	err := c.Ctx.ReadJSON(param)
+	if err != nil {
+		return app.ResponseErrMsg(err.Error())
+	}
+
+	err = global.Validate.ValidateParam(param)
+	if err != nil {
+		return app.ResponseErrMsg(err.Error())
+	}
+
+	categories, err := services.CategoryService.QueryName(param.CategoryName)
+	if err != nil {
+		return app.ToResponseErr(err)
+	}
+
+	return app.ResponseData(categories)
 }

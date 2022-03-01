@@ -75,8 +75,8 @@ func (c *categoryService) setCategoryParent(category *models.Category) error {
 	if parentCategory.IsFinal {
 		return errcode.RequestError.SetMsg("当前分类为最终类，不能添加子类目")
 	}
-	if parentCategory.Level >= 2 && !category.IsFinal {
-		return errcode.RequestError.SetMsg("当前分类必须为最终类")
+	if parentCategory.Level >= 2 {
+		category.IsFinal = true
 	}
 	category.Path = parentCategory.Path + strconv.Itoa(int(parentCategory.ID)) + "-"
 	category.Level = parentCategory.Level + 1
@@ -96,6 +96,7 @@ func (c *categoryService) Delete(id uint) error {
 			return err
 		}
 
+		// 删除分类时， 同时删除子分类
 		return repositories.CategoryRepositories.DeleteWhere(tx.Where("path like ?", category.Path+"%"))
 	})
 	if err != nil {
@@ -104,4 +105,16 @@ func (c *categoryService) Delete(id uint) error {
 	}
 
 	return nil
+}
+
+// QueryName 通过名称搜索分类
+func (c *categoryService) QueryName(categoryName string) ([]*models.Category, error) {
+	db := global.DB.Where("category_name like ?", "%"+categoryName+"%").Where("is_final", true)
+	categories, err := repositories.CategoryRepositories.GetWhereList(db)
+	if err != nil {
+		global.Logger.Error("分类名称模糊查询失败", zap.Error(err))
+		return []*models.Category{}, errcode.SelectError
+	}
+
+	return categories, nil
 }
