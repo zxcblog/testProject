@@ -131,6 +131,10 @@ func (c *CategoryController) PutBy(id uint) *app.Response {
 	category.CategoryID = param.CategoryID
 	category.Sort = param.Sort
 
+	if category.ID == category.CategoryID {
+		return app.ResponseErrMsg("自己不能为自己父级")
+	}
+
 	if err := services.CategoryService.Update(category); err != nil {
 		return app.ToResponseErr(err)
 	}
@@ -164,7 +168,7 @@ type CategoryQueryName struct {
 // @Param root body CategoryQueryName true "分类名称"
 // @Tags 商品分类
 // @Success 200 {object} app.Response{data=[]render.Category}
-// @Router /admin/category/query/name [get]
+// @Router /admin/category/query/name [post]
 func (c *CategoryController) PostQueryName() *app.Response {
 	param := &CategoryQueryName{}
 	err := c.Ctx.ReadJSON(param)
@@ -182,5 +186,5 @@ func (c *CategoryController) PostQueryName() *app.Response {
 		return app.ToResponseErr(err)
 	}
 
-	return app.ResponseData(categories)
+	return app.ResponseData(render.BuildCreategoryPathName(categories))
 }

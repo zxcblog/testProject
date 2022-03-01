@@ -7,7 +7,10 @@
 package render
 
 import (
+	"new-project/cache"
 	"new-project/models"
+	"strconv"
+	"strings"
 )
 
 type Category struct {
@@ -50,5 +53,24 @@ func BuildCreategories(categories []*models.Category) []*Category {
 func BuildCreategoryPathName(categories []*models.Category) []*Category {
 	list := make([]*Category, 0)
 
+	for _, category := range categories {
+		ids := strings.Split(category.Path, "-")
+		if len(ids) < 3 {
+			continue
+		}
+
+		path := ""
+		if id, err := strconv.Atoi(ids[1]); err != nil {
+			path += cache.GetCategoryByID(uint(id)).CategoryName + "/"
+		}
+
+		if id, err := strconv.Atoi(ids[2]); err != nil {
+			path += cache.GetCategoryByID(uint(id)).CategoryName + "/"
+		}
+
+		item := BuildCreategory(category)
+		item.PathName = path + category.CategoryName
+		list = append(list, item)
+	}
 	return list
 }

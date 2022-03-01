@@ -5,7 +5,7 @@ import (
 	"new-project/global"
 	"new-project/models"
 	"new-project/pkg/app"
-	config2 "new-project/pkg/config"
+	"new-project/pkg/config"
 	"new-project/pkg/logger"
 )
 
@@ -18,15 +18,15 @@ import (
 // @BasePath /
 func main() {
 	// 读取配置文件
-	config2.InitConfig("./config.yml")
+	config.InitConfig("./config.yml")
 
 	// 日志文件加载
-	global.Logger = logger.NewLogger(config2.GetLogger())
-	global.AccessLog = logger.NewAccessLogger(config2.GetLogger())
+	global.Logger = logger.NewLogger(config.GetLogger())
+	global.AccessLog = logger.NewAccessLogger(config.GetLogger())
 
 	// 数据库链接
 	var err error
-	if global.DB, err = models.NewDBEngine(config2.GetDB(), models.Models...); err != nil {
+	if global.DB, err = models.NewDBEngine(config.GetDB(), models.Models...); err != nil {
 		panic(err)
 	}
 

@@ -9,6 +9,7 @@ package services
 import (
 	"go.uber.org/zap"
 	"gorm.io/gorm"
+	"new-project/cache"
 	"new-project/global"
 	"new-project/models"
 	"new-project/pkg/errcode"
@@ -26,7 +27,7 @@ func NewCategoryService() *categoryService {
 
 // Get 获取分类信息
 func (c *categoryService) Get(id uint) *models.Category {
-	return repositories.CategoryRepositories.Get(global.DB, id)
+	return cache.GetCategoryByID(id)
 }
 
 // GetListPage 获取分类列表
@@ -46,6 +47,7 @@ func (c *categoryService) Create(category *models.Category) error {
 		return errcode.CreateError.SetMsg("分类创建失败")
 	}
 
+	cache.AddCategory(category)
 	return nil
 }
 
@@ -60,6 +62,8 @@ func (c *categoryService) Update(category *models.Category) error {
 		global.Logger.Error("分类修改失败", zap.Error(err))
 		return errcode.CreateError.SetMsg("分类修改失败")
 	}
+
+	cache.UpdateCategory(category)
 	return nil
 }
 
@@ -85,7 +89,7 @@ func (c *categoryService) setCategoryParent(category *models.Category) error {
 
 // Delete 删除分类
 func (c *categoryService) Delete(id uint) error {
-	category := repositories.CategoryRepositories.Get(global.DB, id)
+	category := c.Get(id)
 	if category == nil {
 		return errcode.SelectError
 	}
@@ -104,6 +108,7 @@ func (c *categoryService) Delete(id uint) error {
 		return errcode.TransactionError.SetMsg("分类删除失败")
 	}
 
+	cache.DelCategory(id)
 	return nil
 }
 
