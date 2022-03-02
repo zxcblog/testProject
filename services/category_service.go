@@ -27,7 +27,7 @@ func NewCategoryService() *categoryService {
 
 // Get 获取分类信息
 func (c *categoryService) Get(id uint) *models.Category {
-	return cache.GetCategoryByID(id)
+	return cache.CategoryCache.GetCategoryByID(id)
 }
 
 // GetListPage 获取分类列表
@@ -47,7 +47,10 @@ func (c *categoryService) Create(category *models.Category) error {
 		return errcode.CreateError.SetMsg("分类创建失败")
 	}
 
-	cache.AddCategory(category)
+	_, err = cache.CategoryCache.AddCategory(category)
+	if err != nil {
+		global.Logger.Error("分类缓存处理错误", zap.Error(err))
+	}
 	return nil
 }
 
@@ -63,7 +66,7 @@ func (c *categoryService) Update(category *models.Category) error {
 		return errcode.CreateError.SetMsg("分类修改失败")
 	}
 
-	cache.UpdateCategory(category)
+	//cache.UpdateCategory(category)
 	return nil
 }
 
@@ -108,7 +111,8 @@ func (c *categoryService) Delete(id uint) error {
 		return errcode.TransactionError.SetMsg("分类删除失败")
 	}
 
-	cache.DelCategory(id)
+	// 删除分类时， 一同删除其他分类
+	//cache.DelCategory(id)
 	return nil
 }
 
