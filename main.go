@@ -1,6 +1,7 @@
 package main
 
 import (
+	"new-project/cache"
 	"new-project/controller"
 	"new-project/global"
 	"new-project/models"
@@ -27,6 +28,11 @@ func main() {
 	// 数据库链接
 	var err error
 	if global.DB, err = models.NewDBEngine(config.GetDB(), models.Models...); err != nil {
+		panic(err)
+	}
+
+	// redis链接
+	if global.Redis, err = cache.InitRedis(config.GetRedis()); err != nil {
 		panic(err)
 	}
 

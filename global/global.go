@@ -7,12 +7,16 @@
 package global
 
 import (
+	"github.com/go-redis/redis/v8"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 	"new-project/pkg/app"
 )
 
-var AccessLog *zap.Logger
-var Logger *zap.Logger
-var DB *gorm.DB
-var Validate *app.Translations
+var (
+	AccessLog *zap.Logger
+	Logger    *zap.Logger
+	DB        *gorm.DB
+	Validate  *app.Translations
+	Redis     *redis.Client
+)

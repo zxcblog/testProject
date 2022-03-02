@@ -3,6 +3,7 @@ module new-project
 go 1.17
 
 require (
+	github.com/go-playground/validator/v10 v10.10.0 // indirect
 	github.com/iris-contrib/swagger/v12 v12.0.1 // indirect
 	github.com/kataras/iris/v12 v12.2.0-alpha6.0.20220221205027-8ded69fd7ed2 // indirect
 	github.com/natefinch/lumberjack v2.0.0+incompatible // indirect
@@ -11,7 +12,6 @@ require (
 	go.uber.org/zap v1.21.0 // indirect
 	gorm.io/driver/mysql v1.3.2 // indirect
 	gorm.io/gorm v1.23.1 // indirect
-	github.com/go-playground/validator/v10 v10.10.0 // indirect
 )
 
 require (
@@ -26,7 +26,9 @@ require (
 	github.com/aymerick/douceur v0.2.0 // indirect
 	github.com/aymerick/raymond v2.0.3-0.20180322193309-b565731e1464+incompatible // indirect
 	github.com/blang/semver/v4 v4.0.0 // indirect
+	github.com/cespare/xxhash/v2 v2.1.2 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.1 // indirect
+	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/eknkc/amber v0.0.0-20171010120322-cdade1c07385 // indirect
 	github.com/fatih/structs v1.1.0 // indirect
 	github.com/flosch/pongo2/v4 v4.0.2 // indirect
@@ -37,6 +39,7 @@ require (
 	github.com/go-openapi/swag v0.21.1 // indirect
 	github.com/go-playground/locales v0.14.0 // indirect
 	github.com/go-playground/universal-translator v0.18.0 // indirect
+	github.com/go-redis/redis/v8 v8.11.4 // indirect
 	github.com/go-sql-driver/mysql v1.6.0 // indirect
 	github.com/gobwas/httphead v0.0.0-20200921212729-da3d93bc3c58 // indirect
 	github.com/gobwas/pool v0.2.1 // indirect
