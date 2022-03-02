@@ -13,7 +13,7 @@ var Models = []interface{}{
 // User 用户表
 type User struct {
 	Model
-	Status   uint   `gorm:"type:tinyint(1);index:idx_shop_user_status;not null;comment:状态"`
+	Status   uint   `gorm:"type:tinyint(1);index:idx_shop_user_status;default:1;not null;comment:状态1正常2非正常"`
 	Username string `gorm:"size:32;unique;comment:账号"`
 	Nickname string `gorm:"size:16;comment:昵称"`
 	Avatar   string `gorm:"type:text;comment:头像"`
