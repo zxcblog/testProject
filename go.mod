@@ -3,6 +3,7 @@ module new-project
 go 1.17
 
 require (
+	github.com/go-playground/validator/v10 v10.10.0 // indirect
 	github.com/iris-contrib/swagger/v12 v12.0.1 // indirect
 	github.com/kataras/iris/v12 v12.2.0-alpha6.0.20220221205027-8ded69fd7ed2 // indirect
 	github.com/natefinch/lumberjack v2.0.0+incompatible // indirect
@@ -11,7 +12,6 @@ require (
 	go.uber.org/zap v1.21.0 // indirect
 	gorm.io/driver/mysql v1.3.2 // indirect
 	gorm.io/gorm v1.23.1 // indirect
-	github.com/go-playground/validator/v10 v10.10.0 // indirect
 )
 
 require (
@@ -84,7 +84,7 @@ require (
 	go.uber.org/multierr v1.6.0 // indirect
 	golang.org/x/crypto v0.0.0-20220214200702-86341886e292 // indirect
 	golang.org/x/net v0.0.0-20220225172249-27dd8689420f // indirect
-	golang.org/x/sys v0.0.0-20220224120231-95c6836cb0e7 // indirect
+	golang.org/x/sys v0.0.0-20220227234510-4e6760a101f9 // indirect
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/time v0.0.0-20220210224613-90d013bbcef8 // indirect
 	golang.org/x/tools v0.1.9 // indirect

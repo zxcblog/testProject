@@ -2,16 +2,17 @@ package controller
 
 import (
 	"fmt"
-	"github.com/iris-contrib/swagger/v12"
-	"github.com/iris-contrib/swagger/v12/swaggerFiles"
-	"github.com/kataras/iris/v12"
-	"github.com/kataras/iris/v12/mvc"
 	"net/http"
 	"new-project/controller/admin"
 	"new-project/controller/api"
 	_ "new-project/docs"
 	"new-project/middleware"
 	"new-project/pkg/config"
+
+	"github.com/iris-contrib/swagger/v12"
+	"github.com/iris-contrib/swagger/v12/swaggerFiles"
+	"github.com/kataras/iris/v12"
+	"github.com/kataras/iris/v12/mvc"
 
 	"github.com/iris-contrib/middleware/cors"
 )
@@ -41,6 +42,7 @@ func Router() {
 	// 系统路由
 	mvc.Configure(app.Party("/api"), func(m *mvc.Application) {
 		m.Party("/system").Handle(new(api.SystemController))
+		m.Party("/user").Handle(new(api.UserController))
 	})
 
 	// 管理员操作
