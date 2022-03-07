@@ -47,7 +47,7 @@ func (c *categoryService) Create(category *models.Category) error {
 		return errcode.CreateError.SetMsg("分类创建失败")
 	}
 
-	_, err = cache.CategoryCache.AddCategory(category)
+	_, err = cache.CategoryCache.SetCategory(category)
 	if err != nil {
 		global.Logger.Error("分类缓存处理错误", zap.Error(err))
 	}
@@ -66,10 +66,14 @@ func (c *categoryService) Update(category *models.Category) error {
 		return errcode.CreateError.SetMsg("分类修改失败")
 	}
 
-	//cache.UpdateCategory(category)
+	_, err = cache.CategoryCache.SetCategory(category)
+	if err != nil {
+		global.Logger.Error("分类缓存处理错误", zap.Error(err))
+	}
 	return nil
 }
 
+//setCategoryParent 设置分类的path前缀及其他属性
 func (c *categoryService) setCategoryParent(category *models.Category) error {
 	if category.CategoryID == 0 {
 		return nil
@@ -85,7 +89,7 @@ func (c *categoryService) setCategoryParent(category *models.Category) error {
 	if parentCategory.Level >= 2 {
 		category.IsFinal = true
 	}
-	category.Path = parentCategory.Path + strconv.Itoa(int(parentCategory.ID)) + "-"
+	category.Path = parentCategory.Path + strconv.Itoa(int(parentCategory.ID)) + models.CategorySep
 	category.Level = parentCategory.Level + 1
 	return nil
 }
@@ -97,6 +101,8 @@ func (c *categoryService) Delete(id uint) error {
 		return errcode.SelectError
 	}
 
+	// 要被删除的子集
+	path := category.Path + strconv.Itoa(int(category.ID))
 	err := global.DB.Transaction(func(tx *gorm.DB) error {
 		err := repositories.CategoryRepositories.Delete(tx, id)
 		if err != nil {
@@ -104,15 +110,16 @@ func (c *categoryService) Delete(id uint) error {
 		}
 
 		// 删除分类时， 同时删除子分类
-		return repositories.CategoryRepositories.DeleteWhere(tx.Where("path like ?", category.Path+"%"))
+
+		return repositories.CategoryRepositories.DeleteWhere(tx.Where("path like ?", path+"%"))
 	})
 	if err != nil {
 		global.Logger.Error("分类删除失败", zap.Error(err))
 		return errcode.TransactionError.SetMsg("分类删除失败")
 	}
 
-	// 删除分类时， 一同删除其他分类
-	//cache.DelCategory(id)
+	//删除分类时， 一同删除其他分类
+	cache.CategoryCache.DelCategory(path)
 	return nil
 }
 

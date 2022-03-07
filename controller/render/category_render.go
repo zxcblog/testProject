@@ -9,7 +9,6 @@ package render
 import (
 	"new-project/cache"
 	"new-project/models"
-	"strconv"
 	"strings"
 )
 
@@ -54,22 +53,20 @@ func BuildCreategoryPathName(categories []*models.Category) []*Category {
 	list := make([]*Category, 0)
 
 	for _, category := range categories {
-		ids := strings.Split(category.Path, "-")
-		if len(ids) < 3 {
+		path := category.CategoryName
+		parentCategory := cache.CategoryCache.GetCategoryByPath(strings.TrimRight(category.Path, models.CategorySep))
+		if parentCategory == nil {
 			continue
 		}
 
-		path := ""
-		if id, err := strconv.Atoi(ids[1]); err != nil {
-			path += cache.GetCategoryByID(uint(id)).CategoryName + "/"
-		}
-
-		if id, err := strconv.Atoi(ids[2]); err != nil {
-			path += cache.GetCategoryByID(uint(id)).CategoryName + "/"
+		path = parentCategory.CategoryName + "/" + path
+		parentCategory = cache.CategoryCache.GetCategoryByPath(strings.TrimRight(parentCategory.Path, models.CategorySep))
+		if parentCategory == nil {
+			continue
 		}
 
 		item := BuildCreategory(category)
-		item.PathName = path + category.CategoryName
+		item.PathName = parentCategory.CategoryName + "/" + path
 		list = append(list, item)
 	}
 	return list
