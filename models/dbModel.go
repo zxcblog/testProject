@@ -7,7 +7,7 @@
 package models
 
 var Models = []interface{}{
-	&Product{}, &User{}, &Category{},
+	&Product{}, &User{}, &Category{}, &ProductSku{},
 }
 
 // User 用户表
@@ -36,4 +36,24 @@ type Category struct {
 // Product 商品表
 type Product struct {
 	Model
+	ProductName  string `gorm:"size:100;comment:spu商品名称"`
+	CategoryID   uint   `gorm:"index:idx_category_shop_category_id;default:0;comment:分类ID"`
+	CoverPic     string `gorm:"size:100;comment:商品缩略图"`
+	PicUrl       string `gorm:"type:text;comment:商品轮播图"`
+	Unit         string `gorm:"size:100;default:件;comment:单位"`
+	Introduction string `gorm:"type:text;comment:介绍"`
+	AttrData     string `gorm:"type:text;comment:规格组"`
+	Status       uint   `gorm:"type:tinyint(1);default:1;comment:上架状态:1=下架,2=申请上架,3=上架"`
+}
+
+// ProductSku 商品sku表
+type ProductSku struct {
+	Model
+	ProductId   uint   `gorm:"index:idx_sku_shop_product_id;comment:商品id"`
+	SkuName     string `gorm:"size:100;comment:sku名称"`
+	Price       uint   `gorm:"dedault:1;comment:价格"`
+	Stock       uint   `gorm:"dedault:1;comment:库存"`
+	No          string `gorm:"size:100;comment:货号"`
+	SkuPic      string `gorm:"size:100;comment:规格图片"`
+	SkuAttrData string `gorm:"type:text;comment:规格组合数据"`
 }
