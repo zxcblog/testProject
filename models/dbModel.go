@@ -7,7 +7,7 @@
 package models
 
 var Models = []interface{}{
-	&Product{}, &User{}, &Category{}, &ProductSku{},
+	&Product{}, &User{}, &Category{}, &ProductSku{}, &Brand{},
 }
 
 // User 用户表
@@ -31,6 +31,15 @@ type Category struct {
 	Sort         uint   `gorm:"default:0;comment:排序"`
 	CategoryID   uint   `gorm:"index:idx_category_shop_category_id;default:0;comment:父级类目"`
 	Level        uint   `gorm:"default:1;comment:级别"`
+}
+
+// Brand 品牌表
+type Brand struct {
+	Model
+	BrandName   string `gorm:"size:512;comment:品牌名称"`
+	BrandImg    string `gorm:"type:text;comment:品牌图片"`
+	Description string `gorm:"type:text;comment:描述"`
+	CategoryID  uint   `gorm:"index:idx_category_shop_category_id;default:0;comment:所属分类"`
 }
 
 // Product 商品表
