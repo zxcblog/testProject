@@ -32,8 +32,8 @@ func ToResponse(msg string, data interface{}) *Response {
 
 func ToResponseList(list interface{}, totalRows int64) *Response {
 	return ToResponse("", Result{
-		"list":       list,
-		"total_rows": totalRows,
+		"list":      list,
+		"totalRows": totalRows,
 	})
 }
 
