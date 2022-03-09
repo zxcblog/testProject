@@ -2,6 +2,8 @@ package controller
 
 import (
 	"fmt"
+	"github.com/iris-contrib/swagger/v12"
+	"github.com/kataras/iris/v12"
 	"net/http"
 	"new-project/controller/admin"
 	"new-project/controller/api"
