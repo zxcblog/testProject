@@ -37,17 +37,10 @@ type CategoryRequest struct {
 // @Tags 商品分类
 // @Success 200 {object} app.Response{data=render.Category}
 // @Router /admin/category [post]
-func (c *CategoryController) Post() *app.Response {
+func (this *CategoryController) Post() *app.Response {
 	param := &CategoryRequest{}
-	err := c.Ctx.ReadJSON(param)
-	if err != nil {
-		return app.ResponseErrMsg(err.Error())
-	}
-
-	// 验证参数是否正确
-	err = global.Validate.ValidateParam(param)
-	if err != nil {
-		return app.ToResponseErr(errcode.InvalidParams.SetMsg(err.Error()))
+	if err := app.FormValueJson(this.Ctx, global.Validate, param); err != nil {
+		return app.ToResponseErr(err)
 	}
 
 	category := &models.Category{
@@ -57,7 +50,7 @@ func (c *CategoryController) Post() *app.Response {
 		CategoryID:   param.CategoryID,
 	}
 
-	if err = services.CategoryService.Create(category); err != nil {
+	if err := services.CategoryService.Create(category); err != nil {
 		return app.ToResponseErr(err)
 	}
 	return app.ResponseData(render.BuildCreategory(category))
@@ -73,10 +66,10 @@ func (c *CategoryController) Post() *app.Response {
 // @Tags 商品分类
 // @Success 200 {object} app.Response{data=[]render.Category}
 // @Router /admin/category [get]
-func (c *CategoryController) Get() *app.Response {
-	categoryID := app.FormValueUintDefault(c.Ctx, "categoryID", 0)
-	page := app.GetPage(c.Ctx)
-	pageSize := app.GetPageSize(c.Ctx)
+func (this *CategoryController) Get() *app.Response {
+	categoryID := app.FormValueUintDefault(this.Ctx, "categoryID", 0)
+	page := app.GetPage(this.Ctx)
+	pageSize := app.GetPageSize(this.Ctx)
 	list, total := services.CategoryService.GetListPage(global.DB.Where("category_id", categoryID), page, pageSize)
 
 	return app.ToResponseList(render.BuildCreategories(list), total)
@@ -90,7 +83,7 @@ func (c *CategoryController) Get() *app.Response {
 // @tags 商品分类
 // @Success 200 {object} app.Response{data=render.Category}
 // @Router /admin/category/{categoryID} [get]
-func (c *CategoryController) GetBy(id uint) *app.Response {
+func (this *CategoryController) GetBy(id uint) *app.Response {
 	res := services.CategoryService.Get(id)
 
 	if res == nil {
@@ -109,21 +102,15 @@ func (c *CategoryController) GetBy(id uint) *app.Response {
 // @Tags 商品分类
 // @Success 200 {object} app.Response{data=render.Category}
 // @Router /admin/category/{categoryID} [put]
-func (c *CategoryController) PutBy(id uint) *app.Response {
+func (this *CategoryController) PutBy(id uint) *app.Response {
 	category := services.CategoryService.Get(id)
 	if category == nil {
 		return app.ToResponseErr(errcode.NotFound)
 	}
 
 	param := &CategoryRequest{}
-	err := c.Ctx.ReadJSON(param)
-	if err != nil {
-		return app.ResponseErrMsg(err.Error())
-	}
-
-	err = global.Validate.ValidateParam(param)
-	if err != nil {
-		return app.ToResponseErr(errcode.InvalidParams.SetMsg(err.Error()))
+	if err := app.FormValueJson(this.Ctx, global.Validate, param); err != nil {
+		return app.ToResponseErr(err)
 	}
 
 	category.CategoryName = param.CategoryName
@@ -150,7 +137,7 @@ func (c *CategoryController) PutBy(id uint) *app.Response {
 // @Tags 商品分类
 // @Success 200 {object} app.Response{data=render.Category}
 // @Router /admin/category/{categoryID} [delete]
-func (c *CategoryController) DeleteBy(id uint) *app.Response {
+func (this *CategoryController) DeleteBy(id uint) *app.Response {
 	if err := services.CategoryService.Delete(id); err != nil {
 		return app.ToResponseErr(err)
 	}
@@ -169,16 +156,10 @@ type CategoryQueryName struct {
 // @Tags 商品分类
 // @Success 200 {object} app.Response{data=[]render.Category}
 // @Router /admin/category/query/name [post]
-func (c *CategoryController) PostQueryName() *app.Response {
+func (this *CategoryController) PostQueryName() *app.Response {
 	param := &CategoryQueryName{}
-	err := c.Ctx.ReadJSON(param)
-	if err != nil {
-		return app.ResponseErrMsg(err.Error())
-	}
-
-	err = global.Validate.ValidateParam(param)
-	if err != nil {
-		return app.ResponseErrMsg(err.Error())
+	if err := app.FormValueJson(this.Ctx, global.Validate, param); err != nil {
+		return app.ToResponseErr(err)
 	}
 
 	categories, err := services.CategoryService.QueryName(param.CategoryName)

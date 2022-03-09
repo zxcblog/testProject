@@ -45,6 +45,8 @@ func ToResponseErr(err error) *Response {
 	errResponse := &Response{Data: nil, Msg: err.Error()}
 	if errCodeErr, ok := err.(*errcode.Error); ok {
 		errResponse.Code = errCodeErr.Code()
+	} else {
+		errResponse.Code = errcode.RequestError.Code()
 	}
 
 	return errResponse

@@ -39,9 +39,8 @@ func (b *brandService) GetListPage(catrgoryID uint, page, pageSize int) ([]*mode
 
 // Create 创建品牌
 func (b *brandService) Create(brand *models.Brand) error {
-	category := CategoryService.Get(brand.CategoryID)
-	if category == nil {
-		return errcode.NotFound
+	if err := b.setCategory(brand.CategoryID); err != nil {
+		return err
 	}
 
 	err := repositories.BrandRepositories.Create(global.DB, brand)
@@ -54,15 +53,25 @@ func (b *brandService) Create(brand *models.Brand) error {
 
 // Update 修改分类
 func (b *brandService) Update(brand *models.Brand) error {
-	category := CategoryService.Get(brand.CategoryID)
-	if category == nil {
-		return errcode.NotFound
+	if err := b.setCategory(brand.CategoryID); err != nil {
+		return err
 	}
 
 	err := repositories.BrandRepositories.Update(global.DB, brand)
 	if err != nil {
 		global.Logger.Error("品牌修改失败", zap.Error(err))
 		return errcode.CreateError.SetMsg("品牌修改失败")
+	}
+	return nil
+}
+
+func (b *brandService) setCategory(categoryID uint) error {
+	category := CategoryService.Get(categoryID)
+	if category == nil {
+		return errcode.NotFound
+	}
+	if !category.IsFinal {
+		return errcode.RequestError.SetMsg("所选分类不是最终类")
 	}
 	return nil
 }

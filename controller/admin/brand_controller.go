@@ -39,15 +39,8 @@ type BrandRequest struct {
 // @Router /admin/brand [post]
 func (b *BrandController) Post() *app.Response {
 	param := &BrandRequest{}
-	err := b.Ctx.ReadJSON(param)
-	if err != nil {
-		return app.ResponseErrMsg(err.Error())
-	}
-
-	// 验证参数是否正确
-	err = global.Validate.ValidateParam(param)
-	if err != nil {
-		return app.ToResponseErr(errcode.InvalidParams.SetMsg(err.Error()))
+	if err := app.FormValueJson(b.Ctx, global.Validate, param); err != nil {
+		return app.ToResponseErr(err)
 	}
 
 	brand := &models.Brand{
@@ -57,14 +50,14 @@ func (b *BrandController) Post() *app.Response {
 		CategoryID:  param.CategoryID,
 	}
 
-	if err = services.BrandService.Create(brand); err != nil {
+	if err := services.BrandService.Create(brand); err != nil {
 		return app.ToResponseErr(err)
 	}
 	return app.ResponseData(render.BuildBrand(brand))
 }
 
 // Get 获取品牌列表
-// Summary 获取品牌列表
+// @Summary 获取品牌列表
 // @Description 获取品牌列表
 // @Produce json
 // @param categoryID query uint false "分类id" default(0)
@@ -116,14 +109,8 @@ func (b *BrandController) PutBy(id uint) *app.Response {
 	}
 
 	param := &BrandRequest{}
-	err := b.Ctx.ReadJSON(param)
-	if err != nil {
-		return app.ResponseErrMsg(err.Error())
-	}
-
-	err = global.Validate.ValidateParam(param)
-	if err != nil {
-		return app.ToResponseErr(errcode.InvalidParams.SetMsg(err.Error()))
+	if err := app.FormValueJson(b.Ctx, global.Validate, param); err != nil {
+		return app.ToResponseErr(err)
 	}
 
 	brand.BrandName = param.BrandName

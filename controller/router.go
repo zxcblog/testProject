@@ -48,10 +48,9 @@ func Router() {
 
 	// 管理员操作
 	mvc.Configure(app.Party("/admin"), func(m *mvc.Application) {
-		//分类
-		m.Party("/category").Handle(new(admin.CategoryController))
-		//商品
-		m.Party("/product").Handle(new(admin.ProductController))
+		m.Party("/category").Handle(new(admin.CategoryController)) //分类
+		m.Party("/brand").Handle(new(admin.BrandController))       //分类
+		m.Party("/product").Handle(new(admin.ProductController))   //商品
 	})
 
 	// iris.WithoutServerError(iris.ErrServerClosed) 忽略iris框架服务启动时的Listen的错误
