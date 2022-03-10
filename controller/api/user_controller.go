@@ -14,6 +14,10 @@ type UserController struct {
 	Ctx iris.Context
 }
 
+type JwtResponseData struct {
+	Toekn string `json:"token"`
+}
+
 type PostRegisterCheckRequest struct {
 	UserName        string `validate:"required,min=4,max=32" label:"账号" json:"userName"`                         // 账号
 	Nickname        string `validate:"required,min=1,max=16" label:"昵称" json:"nikeName"`                         // 昵称
@@ -70,12 +74,30 @@ func (u *UserController) PostLogin() *app.Response {
 	params := &PostLoginCheckRequest{}
 
 	//绑定参数
-
 	if err := u.Ctx.ReadJSON(params); err != nil {
 		return app.ResponseErrMsg(err.Error())
 	}
 
-	//校验账户密码
+	//参数校验
+	if err := global.Validate.ValidateParam(params); err != nil {
+		return app.ToResponseErr(errcode.InvalidParams.SetMsg(err.Error()))
+	}
 
-	return app.ResponseErrMsg("111")
+	user := &models.User{
+		Username: params.UserName,
+		Password: params.Password,
+	}
+
+	//校验账户密码
+	//调用services逻辑处理层
+	if err := services.UserService.Login(user); err != nil {
+		return app.ToResponseErr(err)
+	}
+
+	// 生成Token
+	tokenString, _ := app.GenToken(params.UserName)
+
+	return app.ToResponse("登录成功", JwtResponseData{
+		Toekn: tokenString,
+	})
 }

@@ -32,3 +32,8 @@ func (u *userService) Create(user *models.User) error {
 	}
 	return nil
 }
+
+//调用model 验证账号和密码 调用jwt
+func (u *userService) Login(user *models.User) error {
+
+}
