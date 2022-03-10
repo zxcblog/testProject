@@ -7,7 +7,7 @@
 package models
 
 var Models = []interface{}{
-	&Product{}, &User{}, &Category{}, &ProductSku{}, &Brand{},
+	&Product{}, &User{}, &Category{}, &ProductSku{}, &Brand{}, &Upload{},
 }
 
 // User 用户表
@@ -65,4 +65,14 @@ type ProductSku struct {
 	No          string `gorm:"size:100;comment:货号"`
 	SkuPic      string `gorm:"size:100;comment:规格图片"`
 	SkuAttrData string `gorm:"type:text;comment:规格组合数据"`
+}
+
+// Upload 文件上传保存
+type Upload struct {
+	Model
+	FileSize uint   `gorm:"default:0;comment:文件大小"`
+	SavePath string `gorm:"size:512;comment:文件保存地址"`
+	OldName  string `gorm:"size:512;comment:文件原名称"`
+	NewName  string `gorm:"size:512;comment:新名称"`
+	FileType string `gorm:"size:512;comment:文件类型"`
 }

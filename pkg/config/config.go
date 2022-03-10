@@ -7,11 +7,15 @@ import (
 )
 
 type Service struct {
-	DebugMode   bool   `yaml:"DebugMode"`
-	MaxPageSize int    `yaml:"MaxPageSize"`
-	MinPageSize int    `yaml:"MinPageSize"`
-	Port        string `yaml:"Port"`
-	Host        string `yaml:"Host"`
+	DebugMode            bool     `yaml:"DebugMode"`
+	MaxPageSize          int      `yaml:"MaxPageSize"`
+	MinPageSize          int      `yaml:"MinPageSize"`
+	Port                 string   `yaml:"Port"`
+	Host                 string   `yaml:"Host"`
+	UploadSavePath       string   `yaml:"UploadSavePath"`
+	UploadMaxImgSize     string   `yaml:"UploadMaxImgSize"`
+	UploadVideoMaxSize   string   `yaml:"UploadVideoMaxSize"`
+	UploadImageAllowExts []string `yaml:"UploadImageAllowExts"`
 }
 
 type Logger struct {

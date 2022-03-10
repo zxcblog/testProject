@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"new-project/controller/admin"
 	"new-project/controller/api"
+	"new-project/controller/comm"
 	_ "new-project/docs"
 	"new-project/middleware"
 	"new-project/pkg/config"
@@ -37,22 +38,29 @@ func Router() {
 		app.Get("/swagger", swaggerUI)
 	}
 
-	app.Use(middleware.AccessLog)
+	mvc.Configure(app, func(m *mvc.Application) {
+		m.Router.Use(middleware.AccessLog) // 全局中间件
+		// 前台管理
+		apiRoute := m.Party("/api")
+		apiRoute.Party("/system").Handle(new(api.SystemController))
+		apiRoute.Party("/user").Handle(new(api.UserController)) //用户
 
-	// 系统路由
-	mvc.Configure(app.Party("/api"), func(m *mvc.Application) {
-		m.Party("/system").Handle(new(api.SystemController))
-		//用户
-		m.Party("/user").Handle(new(api.UserController))
-	})
+		// 后台管理
+		adminRoute := m.Party("/admin")
+		adminRoute.Party("/category").Handle(new(admin.CategoryController)) //分类
+		adminRoute.Party("/brand").Handle(new(admin.BrandController))       //品牌
+		adminRoute.Party("/product").Handle(new(admin.ProductController))   //商品
 
-	// 管理员操作
-	mvc.Configure(app.Party("/admin"), func(m *mvc.Application) {
-		m.Party("/category").Handle(new(admin.CategoryController)) //分类
-		m.Party("/brand").Handle(new(admin.BrandController))       //分类
-		m.Party("/product").Handle(new(admin.ProductController))   //商品
+		// 通用路由
+		commRoute := m.Party("/comm")
+		commRoute.Party("/upload").Handle(new(comm.UploadController))
+
 	})
 
 	// iris.WithoutServerError(iris.ErrServerClosed) 忽略iris框架服务启动时的Listen的错误
-	app.Run(iris.Addr(config.GetService().Port), iris.WithoutServerError(iris.ErrServerClosed))
+	// iris.WithOptimizations 应用程序会尽可能优化以获得最佳性能
+	app.Run(iris.Addr(config.GetService().Port),
+		iris.WithoutServerError(iris.ErrServerClosed),
+		iris.WithOptimizations,
+	)
 }

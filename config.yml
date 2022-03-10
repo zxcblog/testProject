@@ -4,6 +4,12 @@ Service:
   MaxPageSize: 100
   MinPageSize: 1
   Host: http://localhost:19610
+  UploadSavePath: stroage/uploads/
+  UploadMaxImgSize: 5
+  UploadVideoMaxSize: 50
+  UploadImageAllowExts:
+    - .jpeg
+    - .png
 
 Logger:
   DebugFile: log/debug/debug.log
