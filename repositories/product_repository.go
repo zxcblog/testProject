@@ -7,40 +7,23 @@
 package repositories
 
 import (
-	"gorm.io/gorm"
 	"new-project/models"
+
+	"gorm.io/gorm"
 )
 
-type IPorduct interface {
-	Insert(*gorm.DB, *models.Product) (int64, error)
-	Delete(*gorm.DB, uint) bool
-	Update(*gorm.DB, *models.Product) error
-	SelectByKey(*gorm.DB, uint) *models.Product
-	SelectAll(*gorm.DB) ([]*models.Product, error)
+var ProductRepositories = NewProductRepositories()
+
+type productRepositories struct{}
+
+func NewProductRepositories() *productRepositories {
+	return &productRepositories{}
 }
 
-type ProductRepositories struct{}
-
-func NewProductRepositories() IPorduct {
-	return &ProductRepositories{}
-}
-
-func (p *ProductRepositories) Insert(db *gorm.DB, product *models.Product) (int64, error) {
-	panic("implement me")
-}
-
-func (p *ProductRepositories) Delete(db *gorm.DB, id uint) bool {
-	panic("implement me")
-}
-
-func (p *ProductRepositories) Update(db *gorm.DB, product *models.Product) error {
-	panic("implement me")
-}
-
-func (p *ProductRepositories) SelectByKey(db *gorm.DB, id uint) *models.Product {
-	panic("implement me")
-}
-
-func (p *ProductRepositories) SelectAll(db *gorm.DB) ([]*models.Product, error) {
-	panic("implement me")
+// Create 创建
+func (p *productRepositories) Create(db *gorm.DB, product *models.Product) (uint, error) {
+	if db.Create(product).Error != nil {
+		return 0, db.Create(product).Error
+	}
+	return product.ID, nil
 }

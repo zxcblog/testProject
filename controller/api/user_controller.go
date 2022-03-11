@@ -88,6 +88,11 @@ func (u *UserController) PostLogin() *app.Response {
 		Password: params.Password,
 	}
 
+	//参数校验
+	if err := global.Validate.ValidateParam(params); err != nil {
+		return app.ToResponseErr(errcode.InvalidParams.SetMsg(err.Error()))
+	}
+
 	//校验账户密码
 	//调用services逻辑处理层
 	if err := services.UserService.Login(user); err != nil {
