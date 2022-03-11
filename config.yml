@@ -7,9 +7,12 @@ Service:
   UploadSavePath: stroage/uploads/
   UploadMaxImgSize: 5
   UploadVideoMaxSize: 50
+  UploadVideoAllowExts:
+    - mp4
   UploadImageAllowExts:
-    - .jpeg
-    - .png
+    - jpeg
+    - jpg
+    - png
 
 Logger:
   DebugFile: log/debug/debug.log

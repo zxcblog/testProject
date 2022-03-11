@@ -13,9 +13,10 @@ type Service struct {
 	Port                 string   `yaml:"Port"`
 	Host                 string   `yaml:"Host"`
 	UploadSavePath       string   `yaml:"UploadSavePath"`
-	UploadMaxImgSize     string   `yaml:"UploadMaxImgSize"`
-	UploadVideoMaxSize   string   `yaml:"UploadVideoMaxSize"`
+	UploadImgMaxSize     float64  `yaml:"UploadMaxImgSize"`
+	UploadVideoMaxSize   float64  `yaml:"UploadVideoMaxSize"`
 	UploadImageAllowExts []string `yaml:"UploadImageAllowExts"`
+	UploadVideoAllowExts []string `yaml:"UploadVideoAllowExts"`
 }
 
 type Logger struct {
