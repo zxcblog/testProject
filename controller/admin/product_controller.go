@@ -1,6 +1,7 @@
 package admin
 
 import (
+	"encoding/json"
 	"fmt"
 	"new-project/global"
 	"new-project/models"
@@ -61,11 +62,42 @@ func (p *ProductController) PostProductadd() *app.Response {
 
 	//插入sku key与value
 	for _, val := range params.SkuAttributeKeyValueData {
-		fmt.Println(val.AttributeKey)
-		for _, val := range val.AttributeValue {
-			fmt.Println(val)
-
+		productSkuKey := &models.ProductSkuKey{
+			ProductId:    product.ID,
+			BrandId:      params.BrandId,
+			AttributeKey: val.AttributeKey,
 		}
+		//添加规格key
+		skuKeyErr := services.ProductSkuKeyService.Create(productSkuKey)
+		if skuKeyErr != nil {
+			return app.ToResponseErr(skuKeyErr)
+		}
+		//使用切片批量添加value
+		productSkuValue := make([]models.ProductSkuValue, 0)
+		for _, val := range val.AttributeValue {
+			//组装数据
+			productSkuValue = append(productSkuValue, models.ProductSkuValue{
+				ProductId:       product.ID,
+				ProductSkuKeyId: productSkuKey.ID,
+				AttributeValue:  val,
+			})
+		}
+		//批量添加规格value
+		skuValueRrr := services.ProductSkuValueService.BatchCreate(&productSkuValue)
+		if skuValueRrr != nil {
+			return app.ToResponseErr(skuValueRrr)
+		}
+	}
+
+	//插入组装好的规格数据
+	for _, SkuDataVal := range params.SkuData {
+		jsonSkuAttribute, err := json.Marshal(SkuDataVal.SkuAttribute)
+		//Marshal失败时err!=nil
+		if err != nil {
+			fmt.Println("生成json字符串错误")
+		}
+		//jsonSkuAttribute是[]byte类型，转化成string类型便于查看
+		fmt.Println(string(jsonSkuAttribute))
 	}
 
 	fmt.Println(product.ID)
