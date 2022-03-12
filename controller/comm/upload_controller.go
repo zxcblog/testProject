@@ -1,17 +1,11 @@
 package comm
 
 import (
-	"fmt"
 	"github.com/kataras/iris/v12"
-	"go.uber.org/zap"
-	"new-project/global"
+	"new-project/controller/render"
 	"new-project/pkg/app"
-	"new-project/pkg/config"
 	"new-project/pkg/errcode"
-	"new-project/pkg/util"
-	"path/filepath"
-	"strings"
-	"time"
+	"new-project/services"
 )
 
 type UploadController struct {
@@ -25,49 +19,18 @@ type UploadController struct {
 // @Produce json
 // @param file formData file true "文件"
 // @Tags 文件上传
-// @Success 200 {object} app.Response{}
+// @Success 200 {object} app.Response{data=render.Upload}
 // @Router /comm/upload [post]
 func (this *UploadController) Post() *app.Response {
-	_, fileHeader, err := this.Ctx.FormFile("file")
+	file, fileHeader, err := this.Ctx.FormFile("file")
 	if err != nil {
 		return app.ToResponseErr(errcode.UploadFileError.SetMsg(err.Error()))
 	}
+	defer file.Close()
 
-	// 通过文件名获取文件后缀
-	fileExt := fileHeader.Filename[strings.LastIndex(fileHeader.Filename, ".")+1:]
-	switch {
-	case util.InArray(fileExt, config.GetService().UploadImageAllowExts):
-		uploadImgSize := config.GetService().UploadImgMaxSize
-		if util.BigToSmall(uploadImgSize, "m") < fileHeader.Size {
-			return app.ToResponseErr(errcode.UploadFileError.SetMsg(fmt.Sprintf("图片上传不能超过%fM", uploadImgSize)))
-		}
-
-	case util.InArray(fileExt, config.GetService().UploadVideoAllowExts):
-		uploadVideoSize := config.GetService().UploadVideoMaxSize
-		if util.BigToSmall(uploadVideoSize, "m") < fileHeader.Size {
-			return app.ToResponseErr(errcode.UploadFileError.SetMsg(fmt.Sprintf("视频上传不能超过%fM", uploadVideoSize)))
-		}
-	default:
-		return app.ToResponseErr(errcode.UploadFileError.SetMsg("文件上传类型不正确"))
-	}
-
-	// 创建文件夹
-
-	dest := filepath.Join(config.GetService().UploadSavePath, time.Now().Format("20060102"), util.RandomStr(32)+"."+fileExt)
-	_, err = this.Ctx.SaveFormFile(fileHeader, dest)
+	upload, err := services.UploadService.Upload(file, fileHeader)
 	if err != nil {
-		global.Logger.Error("文件上传失败", zap.Error(err))
-		return app.ToResponseErr(errcode.UploadFileError.SetMsg("文件上传失败"))
+		return app.ToResponseErr(err)
 	}
-
-	//
-	//upload := &models.Upload{
-	//	FileSize: uint(fileHeader.Size),
-	//	SavePath: "",
-	//	OldName:  "",
-	//	NewName:  "",
-	//	FileType: "",
-	//}
-	//
-	return app.ResponseMsg("上传成功")
+	return app.ResponseData(render.BuildUpload(upload))
 }

@@ -89,4 +89,5 @@ type Upload struct {
 	OldName  string `gorm:"size:512;comment:文件原名称"`
 	NewName  string `gorm:"size:512;comment:新名称"`
 	FileType string `gorm:"size:512;comment:文件类型"`
+	FileExt  string `gorm:"size:512;comment:文件后缀"`
 }
