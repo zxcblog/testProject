@@ -45,14 +45,14 @@ type Brand struct {
 // Product 商品表
 type Product struct {
 	Model
-	ProductName  string `gorm:"size:50;comment:商品名称"`
-	ProductTitle string `gorm:"size:100;comment:商品标题"`
-	CategoryID   uint   `gorm:"index:idx_category_shop_category_id;default:0;comment:分类ID"`
-	BrandId      uint   `gorm:"index:idx_category_shop_brand_id;default:0;comment:品牌ID"`
-	CategoryImg  string `gorm:"size:100;comment:商品主图"`
-	PicImg       string `gorm:"type:text;comment:商品轮播图"`
-	Status       uint   `gorm:"type:tinyint(1);default:1;comment:上架状态:1=下架,2=申请上架,3=上架"`
-	Introduction string `gorm:"type:text;comment:详情介绍"`
+	ProductName   string `gorm:"size:50;comment:商品名称"`
+	ProductTitle  string `gorm:"size:100;comment:商品标题"`
+	CategoryID    uint   `gorm:"index:idx_category_shop_category_id;default:0;comment:分类ID"`
+	BrandId       uint   `gorm:"index:idx_category_shop_brand_id;default:0;comment:品牌ID"`
+	CategoryImgId uint   `gorm:"not null;comment:商品主图ID"`
+	PicImgIds     string `gorm:"type:text;comment:商品轮播图ID组"`
+	Status        uint   `gorm:"type:tinyint(1);default:1;comment:上架状态:1=下架,2=申请上架,3=上架"`
+	Introduction  string `gorm:"type:text;comment:详情介绍"`
 }
 
 // ProductSku 商品sku表

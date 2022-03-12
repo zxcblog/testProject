@@ -20,8 +20,8 @@ type PostProductAddCheckedParams struct {
 	ProductTitle             string `validata:"required,max=100" label:"商品标题" json:"productTitle"` //商品标题
 	CategoryID               uint   `validata:"required" label:"商品分类" json:"categoryID"`           //商品分类
 	BrandId                  uint   `validata:"required" label:"品牌分类" json:"brandId"`              //品牌分类
-	CategoryImg              string `validata:"required" label:"商品主图" json:"categoryImg"`          //商品主图
-	PicImg                   string `validata:"required" label:"商品缩略图" json:"picImg"`              //商品缩略图
+	CategoryImgId            uint   `validata:"required" label:"商品主图ID" json:"categoryImgId"`      //商品主图ID
+	PicImgIds                string `validata:"required" label:"商品缩略图" json:"picImgIds"`           //商品缩略图
 	Introduction             string `label:"商品详情" json:"introduction"`                             //商品详情
 	SkuAttributeKeyValueData []struct {
 		AttributeKey   string   `validata:"required" json:"attributeKey"`
@@ -43,17 +43,17 @@ func (p *ProductController) PostProductadd() *app.Response {
 
 	//商品model赋值
 	product := &models.Product{
-		ProductName:  params.ProductName,
-		ProductTitle: params.ProductTitle,
-		CategoryID:   params.CategoryID,
-		BrandId:      params.BrandId,
-		CategoryImg:  params.CategoryImg,
-		PicImg:       params.PicImg,
-		Introduction: params.Introduction,
+		ProductName:   params.ProductName,
+		ProductTitle:  params.ProductTitle,
+		CategoryID:    params.CategoryID,
+		BrandId:       params.BrandId,
+		CategoryImgId: params.CategoryImgId,
+		PicImgIds:     params.PicImgIds,
+		Introduction:  params.Introduction,
 	}
 
-	//返回商品id
-	productId, err := services.ProductService.Create(product)
+	//添加商品主信息
+	err := services.ProductService.Create(product)
 
 	if err != nil {
 		return app.ToResponseErr(err)
@@ -68,7 +68,7 @@ func (p *ProductController) PostProductadd() *app.Response {
 		}
 	}
 
-	fmt.Println(productId)
+	fmt.Println(product.ID)
 
 	return app.ResponseMsg("添加成功")
 }

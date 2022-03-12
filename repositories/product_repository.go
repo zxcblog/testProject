@@ -21,9 +21,6 @@ func NewProductRepositories() *productRepositories {
 }
 
 // Create 创建
-func (p *productRepositories) Create(db *gorm.DB, product *models.Product) (uint, error) {
-	if db.Create(product).Error != nil {
-		return 0, db.Create(product).Error
-	}
-	return product.ID, nil
+func (p *productRepositories) Create(db *gorm.DB, product *models.Product) error {
+	return db.Create(product).Error
 }

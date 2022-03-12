@@ -17,11 +17,12 @@ func NewProductService() *productService {
 	return &productService{}
 }
 
-func (u *productService) Create(product *models.Product) (uint, error) {
-	productId, err := repositories.ProductRepositories.Create(global.DB, product)
+//添加商品主信息
+func (u *productService) Create(product *models.Product) error {
+	err := repositories.ProductRepositories.Create(global.DB, product)
 	if err != nil {
-		global.Logger.Error("添加失败", zap.Error(err))
-		return 0, errcode.CreateError.SetMsg("添加失败")
+		global.Logger.Error("商品添加失败", zap.Error(err))
+		return errcode.CreateError.SetMsg("商品添加失败")
 	}
-	return productId, nil
+	return nil
 }
