@@ -40,7 +40,7 @@ type Database struct {
 	MaxOpenConns int    `yaml:"MaxOpenConns"`
 }
 
-type Reids struct {
+type Redis struct {
 	Host      string `yaml:"Host"`
 	Password  string `yaml:"Password"`
 	DefaultDB int    `yaml:"DefaultDB"`
@@ -50,7 +50,7 @@ type Config struct {
 	Service Service  `yaml:"Service"`
 	Logger  Logger   `yaml:"Logger"`
 	DB      Database `yaml:"DB"`
-	Redis   Reids    `yaml:"Reids"`
+	Redis   Redis    `yaml:"Redis"`
 }
 
 var config Config
@@ -67,7 +67,7 @@ func GetDB() Database {
 	return config.DB
 }
 
-func GetRedis() Reids {
+func GetRedis() Redis {
 	return config.Redis
 }
 
