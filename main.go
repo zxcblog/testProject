@@ -13,9 +13,9 @@ import (
 // @title 测试商城项目
 // @version 1.0
 // @description 自己学习的测试商城项目
-// @termsOfService http://127.0.0.1:19610
+// @termsOfService http://1.14.127.213:19610
 
-// @host 127.0.0.1:19610
+// @host 1.14.127.213:19610
 // @BasePath /
 func main() {
 	// 读取配置文件

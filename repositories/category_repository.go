@@ -45,7 +45,7 @@ func (c *categoryRepositories) GetWhereList(db *gorm.DB) ([]*models.Category, er
 
 // GetList 获取分类列表
 func (c *categoryRepositories) GetList(db *gorm.DB, page, pageSize int) ([]*models.Category, int64) {
-	list := make([]*models.Category, pageSize)
+	list := make([]*models.Category, 0, pageSize)
 	var total int64
 	db.Model(models.Category{}).Count(&total).
 		Order("sort desc").
