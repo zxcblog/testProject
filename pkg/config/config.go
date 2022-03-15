@@ -10,7 +10,6 @@ type Service struct {
 	DebugMode            bool     `yaml:"DebugMode"`
 	MaxPageSize          int      `yaml:"MaxPageSize"`
 	MinPageSize          int      `yaml:"MinPageSize"`
-	Port                 string   `yaml:"Port"`
 	Host                 string   `yaml:"Host"`
 	UploadSavePath       string   `yaml:"UploadSavePath"`
 	UploadImgMaxSize     float64  `yaml:"UploadMaxImgSize"`

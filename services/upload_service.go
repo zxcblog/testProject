@@ -25,6 +25,10 @@ func NewUploadService() *uploadService {
 	return &uploadService{}
 }
 
+func (*uploadService) Get(id uint) *models.Upload {
+	return repositories.UploadRepositories.Get(global.DB, id)
+}
+
 func (*uploadService) Upload(file multipart.File, fileHeader *multipart.FileHeader) (*models.Upload, error) {
 	// 通过文件名获取文件后缀
 	fileExt := fileHeader.Filename[strings.LastIndex(fileHeader.Filename, ".")+1:]

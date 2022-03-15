@@ -25,7 +25,7 @@ func (b *brandRepositories) Get(db *gorm.DB, id uint) *models.Brand {
 
 // GetList 获取分类列表
 func (b *brandRepositories) GetList(db *gorm.DB, page, pageSize int) ([]*models.Brand, int64) {
-	list := make([]*models.Brand, pageSize)
+	list := make([]*models.Brand, 0, pageSize)
 	var total int64
 	db.Model(models.Brand{}).Count(&total).
 		Order("sort desc").

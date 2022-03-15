@@ -8,8 +8,8 @@ import (
 	"new-project/controller/admin"
 	"new-project/controller/api"
 	"new-project/controller/comm"
+	"new-project/controller/middleware"
 	_ "new-project/docs"
-	"new-project/middleware"
 	"new-project/pkg/config"
 
 	"github.com/iris-contrib/swagger/v12/swaggerFiles"
@@ -39,7 +39,8 @@ func Router() {
 	}
 
 	mvc.Configure(app, func(m *mvc.Application) {
-		m.Router.Use(middleware.AccessLog) // 全局中间件
+		m.Router.Use(middleware.AccessLog) // 访问日志中间件
+		//m.Router.Use(middleware.Limiter)   // 限流
 		// 前台管理
 		apiRoute := m.Party("/api")
 		apiRoute.Party("/system").Handle(new(api.SystemController))
@@ -59,7 +60,7 @@ func Router() {
 
 	// iris.WithoutServerError(iris.ErrServerClosed) 忽略iris框架服务启动时的Listen的错误
 	// iris.WithOptimizations 应用程序会尽可能优化以获得最佳性能
-	app.Run(iris.Addr(config.GetService().Port),
+	app.Run(iris.Addr(":19610"),
 		iris.WithoutServerError(iris.ErrServerClosed),
 		iris.WithOptimizations,
 	)

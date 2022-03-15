@@ -13,16 +13,16 @@ func NewUploadRepositories() *uploadRepositories {
 	return &uploadRepositories{}
 }
 
-//// Get 通过id进行搜索
-//func (b *uploadRepositories) Get(db *gorm.DB, id uint) *models.Upload {
-//	ret := &models.Upload{}
-//	if err := db.First(ret, "id = ?", id).Error; err != nil {
-//		return nil
-//	}
-//
-//	return ret
-//}
-//
+// Get 通过id进行搜索
+func (b *uploadRepositories) Get(db *gorm.DB, id uint) *models.Upload {
+	ret := &models.Upload{}
+	if err := db.First(ret, "id = ?", id).Error; err != nil {
+		return nil
+	}
+
+	return ret
+}
+
 //// GetList 获取分类列表
 //func (b *uploadRepositories) GetList(db *gorm.DB, page, pageSize int) ([]*models.Upload, int64) {
 //	list := make([]*models.Upload, pageSize)
