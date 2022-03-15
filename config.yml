@@ -24,7 +24,7 @@ DB:
   DBType: mysql
   Username: root
   Password: 123456
-  Host: 127.0.0.1
+  Host: project_mysql
   Port: 3306
   DBName: shop
   TablePrefix: shop_
@@ -33,6 +33,6 @@ DB:
   MaxIdleConns: 10
   MaxOpenConns: 30
 Redis:
-  Host: 127.0.0.1:6379
+  Host: project_redis:6379
   Password:
   DefaultDB: 0

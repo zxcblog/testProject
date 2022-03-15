@@ -1,0 +1,53 @@
+version: "3.9"
+services:
+  project:
+    build:
+      context: ../
+    container_name: project
+    ports:
+      - "19610:19610"
+    volumes:
+      - ../config.yml:/app/config.yml:ro
+    depends_on:
+      - project_mysql
+      - project_redis
+    entrypoint: ["/app/new-project"]
+    restart: always
+    networks:
+      - new_project
+  mysql:
+    image: mysql:8.0
+    container_name: project_mysql
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./services/mysql/mysql.cnf:/etc/mysql/conf.d/mysql.cnf:ro
+      - ./data/mysql:/var/lib/mysql/:rw
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: "123456"
+      TZ: "Asia/Shanghai"
+    networks:
+      - new_project
+  redis:
+    image: redis:6-alpine
+    container_name: project_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./services/redis/redis-6.conf:/etc/redis.conf:ro
+      - ./data/redis:/data/:rw
+    restart: always
+    entrypoint: ["redis-server", "/etc/redis.conf"]
+    environment:
+      TZ: "Asia/Shanghai"
+    networks:
+      - new_project
+networks:
+  new_project:
+    # 使用 桥接网络
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.16.223.0/24
