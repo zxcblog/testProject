@@ -18,3 +18,13 @@ func NewUserRepositories() *userRepositories {
 func (u *userRepositories) Create(db *gorm.DB, user *models.User) error {
 	return db.Create(user).Error
 }
+
+// 根据账号查询用户
+func (u *userRepositories) GetUsernameData(db *gorm.DB, userName string) *models.User {
+	ret := &models.User{}
+	if err := db.First(ret, "username = ?", userName).Error; err != nil {
+		return nil
+	}
+
+	return ret
+}

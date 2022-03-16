@@ -4,7 +4,7 @@ import (
 	"new-project/global"
 	"new-project/models"
 	"new-project/pkg/app"
-	"new-project/pkg/errcode"
+	"new-project/pkg/util"
 	"new-project/services"
 
 	"github.com/kataras/iris/v12"
@@ -18,16 +18,25 @@ type JwtResponseData struct {
 	Toekn string `json:"token"`
 }
 
+type CaptchResponseData struct {
+	CaptchaPath string `json:"captchaPath"`
+	CaptchaId   string `json:"captchaId"`
+}
+
 type PostRegisterCheckRequest struct {
 	UserName        string `validate:"required,min=4,max=32" label:"账号" json:"userName"`                         // 账号
 	Nickname        string `validate:"required,min=1,max=16" label:"昵称" json:"nikeName"`                         // 昵称
 	Password        string `validate:"required,min=4,max=16" label:"昵称" json:"passWord"`                         // 密码
 	ConfirmPassword string `validate:"required,min=4,max=16,eqfield=Password" label:"昵称" json:"confirmPassWord"` // 确认密码
+	CaptchaId       string `validate:"required" label:"验证码id" json:"captchaId"`                                  // 验证码id
+	UserCapt        string `validate:"required" label:"验证码" json:"userCapt"`                                     // 验证码
 }
 
 type PostLoginCheckRequest struct {
-	UserName string `validate:"required,min=4,max=32" label:"账号" json:"userName"` // 账号
-	Password string `validate:"required,min=4,max=16" label:"昵称" json:"passWord"` // 密码
+	UserName  string `validate:"required,min=4,max=32" label:"账号" json:"userName"` // 账号
+	Password  string `validate:"required,min=4,max=16" label:"昵称" json:"passWord"` // 密码
+	CaptchaId string `validate:"required" label:"验证码id" json:"captchaId"`          // 验证码id
+	UserCapt  string `validate:"required" label:"验证码" json:"userCapt"`             // 验证码
 }
 
 // Post 用户注册
@@ -39,17 +48,16 @@ type PostLoginCheckRequest struct {
 // @Tags 用户注册
 // @Success 200 {object} app.Response "注册成功"
 // @Router /api/user/register [post]
-func (u *UserController) PostRegister() *app.Response {
+func (this *UserController) PostRegister() *app.Response {
 	params := &PostRegisterCheckRequest{}
 
-	//绑定参数
-	if err := u.Ctx.ReadJSON(params); err != nil {
-		return app.ResponseErrMsg(err.Error())
+	//参数校验 && 绑定参数
+	if err := app.FormValueJson(this.Ctx, global.Validate, params); err != nil {
+		return app.ToResponseErr(err)
 	}
 
-	//参数校验
-	if err := global.Validate.ValidateParam(params); err != nil {
-		return app.ToResponseErr(errcode.InvalidParams.SetMsg(err.Error()))
+	if !util.VerifyCaptcha(params.CaptchaId, params.UserCapt) {
+		return app.ResponseErrMsg("验证码错误")
 	}
 
 	//绑定model参数
@@ -65,22 +73,49 @@ func (u *UserController) PostRegister() *app.Response {
 	}
 
 	//返回用户登录信息
-	//先写登录 直接调用登录方法
-	return app.ResponseMsg("注册成功")
+	// 生成Token
+	tokenString, _ := app.GenToken(user)
+
+	return app.ToResponse("注册成功", JwtResponseData{
+		Toekn: tokenString,
+	})
 }
 
-//用户登录
-func (u *UserController) PostLogin() *app.Response {
+// Post 获取验证码
+// @Summary 获取验证码
+// @Description 前台获取验证码
+// @Accept json
+// @Produce json
+// @param root body  true "获取验证码"
+// @Tags 获取验证码
+// @Success 200 {object} app.Response CaptchResponseData{}
+// @Router /api/user/login [get]
+func (this *UserController) GetLogin() *app.Response {
+	capt := util.Captcha(4)
+	return app.ToResponse("获取成功", CaptchResponseData{
+		CaptchaPath: capt.Path,
+		CaptchaId:   capt.Id,
+	})
+}
+
+// Post 用户登录
+// @Summary 用户登录
+// @Description 前台用户登录
+// @Accept json
+// @Produce json
+// @param root body PostLoginCheckRequest true "用户登录"
+// @Tags 用户登录
+// @Success 200 {object} app.Response JwtResponseData
+// @Router /api/user/login [post]
+func (this *UserController) PostLogin() *app.Response {
 	params := &PostLoginCheckRequest{}
 
-	//绑定参数
-	if err := u.Ctx.ReadJSON(params); err != nil {
-		return app.ResponseErrMsg(err.Error())
+	if err := app.FormValueJson(this.Ctx, global.Validate, params); err != nil {
+		return app.ToResponseErr(err)
 	}
 
-	//参数校验
-	if err := global.Validate.ValidateParam(params); err != nil {
-		return app.ToResponseErr(errcode.InvalidParams.SetMsg(err.Error()))
+	if !util.VerifyCaptcha(params.CaptchaId, params.UserCapt) {
+		return app.ResponseErrMsg("验证码错误")
 	}
 
 	user := &models.User{
@@ -88,20 +123,18 @@ func (u *UserController) PostLogin() *app.Response {
 		Password: params.Password,
 	}
 
-	//参数校验
-	if err := global.Validate.ValidateParam(params); err != nil {
-		return app.ToResponseErr(errcode.InvalidParams.SetMsg(err.Error()))
-	}
-
-	//校验账户密码
-	//调用services逻辑处理层
+	//调用services逻辑层  校验账户密码
 	if err := services.UserService.Login(user); err != nil {
 		return app.ToResponseErr(err)
 	}
 
 	// 生成Token
-	tokenString, _ := app.GenToken(params.UserName)
+	tokenString, err := app.GenToken(user)
+	if err != nil {
+		return app.ToResponseErr(err)
+	}
 
+	//返回参数
 	return app.ToResponse("登录成功", JwtResponseData{
 		Toekn: tokenString,
 	})

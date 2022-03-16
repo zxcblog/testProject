@@ -35,5 +35,18 @@ func (u *userService) Create(user *models.User) error {
 
 //调用model 验证账号和密码 调用jwt
 func (u *userService) Login(user *models.User) error {
+	userData := repositories.UserRepositories.GetUsernameData(global.DB, user.Username)
+	if userData == nil {
+		return errcode.CreateError.SetMsg("用户名或密码错误")
+	}
+
+	if userData.Status == 2 {
+		return errcode.CreateError.SetMsg("账号状态异常")
+	}
+
+	//校验密码
+	if userCheckPassWord := app.Md5Salt(user.Password, userData.Salt); userCheckPassWord != userData.Password {
+		return errcode.CreateError.SetMsg("用户名或密码错误")
+	}
 	return nil
 }
