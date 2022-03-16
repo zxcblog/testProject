@@ -7,7 +7,7 @@
 package models
 
 var Models = []interface{}{
-	&Product{}, &User{}, &Category{}, &ProductSku{}, &Brand{}, &Upload{}, &ProductSkuKey{}, &ProductSkuValue{},
+	&Product{}, &User{}, &Category{}, &ProductSku{}, &Brand{}, &Upload{}, &ProductSkuKeyValue{},
 }
 
 // User 用户表
@@ -65,21 +65,13 @@ type ProductSku struct {
 	Price        uint   `gorm:"dedault:1;comment:价格"`
 }
 
-// ProductSku 商品sku属性key表
-type ProductSkuKey struct {
+// ProductSku 商品sku属性key和value表
+type ProductSkuKeyValue struct {
 	Model
-	ProductId    uint   `gorm:"index:idx_sku_key_shop_product_id;comment:商品id"`
-	BrandId      uint   `gorm:"index:idx_sku_key_shop_brand_id;default:0;comment:品牌ID"`
-	AttributeKey string `gorm:"size:100;comment:属性值"`
-}
-
-// ProductSku 商品sku属性value表
-type ProductSkuValue struct {
-	Model
-	ProductId       uint   `gorm:"index:idx_sku_value_shop_product_id;comment:商品id"`
-	ProductSkuKeyId uint   `gorm:"index:idx_sku_value_shop_product_id;comment:属性id"`
-	AttributeValue  string `gorm:"size:100;comment:属性值"`
-	Sort            uint   `gorm:"comment:排序"`
+	ProductId      uint   `gorm:"index:idx_sku_key_shop_product_id;comment:商品id"`
+	BrandId        uint   `gorm:"index:idx_sku_key_shop_brand_id;default:0;comment:品牌ID"`
+	AttributeKey   string `gorm:"size:100;comment:属性key值"`
+	AttributeValue string `gorm:"size:100;comment:属性value json值"`
 }
 
 // Upload 文件上传保存

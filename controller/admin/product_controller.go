@@ -1,10 +1,10 @@
 package admin
 
 import (
-	"encoding/json"
 	"new-project/global"
 	"new-project/models"
 	"new-project/pkg/app"
+	"new-project/pkg/util"
 	"new-project/services"
 
 	"github.com/kataras/iris/v12"
@@ -50,11 +50,7 @@ func (this *ProductController) PostProductadd() *app.Response {
 		return app.ToResponseErr(err)
 	}
 
-	jsonPicImgIds, err := json.Marshal(params.PicImgIds)
-	//Marshal失败时err!=nil
-	if err != nil {
-		return app.ToResponseErr(err)
-	}
+	//TODO 增加事务
 
 	//商品model赋值
 	product := &models.Product{
@@ -63,64 +59,48 @@ func (this *ProductController) PostProductadd() *app.Response {
 		CategoryID:    params.CategoryID,
 		BrandId:       params.BrandId,
 		CategoryImgId: params.CategoryImgId,
-		PicImgIds:     string(jsonPicImgIds),
+		PicImgIds:     util.StructToString(params.PicImgIds),
 		Introduction:  params.Introduction,
 	}
 
 	//添加商品主信息
-	productErr := services.ProductService.Create(product)
+	err := services.ProductService.Create(product)
 
-	if productErr != nil {
-		return app.ToResponseErr(productErr)
+	if err != nil {
+		return app.ToResponseErr(err)
 	}
 
 	//插入sku key与value
+	SkuKeyValueSliceData := make([]models.ProductSkuKeyValue, 0)
 	for _, val := range params.SkuAttributeKeyValueData {
-		productSkuKey := &models.ProductSkuKey{
-			ProductId:    product.ID,
-			BrandId:      params.BrandId,
-			AttributeKey: val.AttributeKey,
-		}
-		//添加规格key
-		skuKeyErr := services.ProductSkuKeyService.Create(productSkuKey)
-		if skuKeyErr != nil {
-			return app.ToResponseErr(skuKeyErr)
-		}
-		//使用切片批量添加value
-		productSliceSkuValue := make([]models.ProductSkuValue, 0)
-		for _, val := range val.AttributeValue {
-			//组装数据
-			productSliceSkuValue = append(productSliceSkuValue, models.ProductSkuValue{
-				ProductId:       product.ID,
-				ProductSkuKeyId: productSkuKey.ID,
-				AttributeValue:  val,
-			})
-		}
-		//批量添加规格value
-		skuValueRrr := services.ProductSkuValueService.BatchCreate(&productSliceSkuValue)
-		if skuValueRrr != nil {
-			return app.ToResponseErr(skuValueRrr)
-		}
+
+		SkuKeyValueSliceData = append(SkuKeyValueSliceData, models.ProductSkuKeyValue{
+			ProductId:      product.ID,
+			BrandId:        params.BrandId,
+			AttributeKey:   val.AttributeKey,
+			AttributeValue: util.StructToString(val.AttributeValue),
+		})
+	}
+	//批量添加规格key和value
+	err = services.ProductSkuKeyValueService.BatchCreate(&SkuKeyValueSliceData)
+	if err != nil {
+		return app.ToResponseErr(err)
 	}
 
 	SkuSliceData := make([]models.ProductSku, 0)
 	//插入组装好的规格数据
 	for _, SkuDataVal := range params.SkuData {
-		jsonSkuAttribute, err := json.Marshal(SkuDataVal.SkuAttribute)
-		//Marshal失败时err!=nil
-		if err != nil {
-			return app.ToResponseErr(err)
-		}
+
 		SkuSliceData = append(SkuSliceData, models.ProductSku{
 			ProductId:    product.ID,
-			SkuAttribute: string(jsonSkuAttribute),
+			SkuAttribute: util.StructToString(SkuDataVal.SkuAttribute),
 			Stock:        SkuDataVal.Stock,
 			Price:        SkuDataVal.Price,
 		})
 	}
-	skuErr := services.ProductSkuService.BatchCreate(&SkuSliceData)
-	if skuErr != nil {
-		return app.ToResponseErr(skuErr)
+	err = services.ProductSkuService.BatchCreate(&SkuSliceData)
+	if err != nil {
+		return app.ToResponseErr(err)
 	}
 
 	return app.ResponseMsg("添加成功")
