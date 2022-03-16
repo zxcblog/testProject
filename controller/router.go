@@ -2,8 +2,6 @@ package controller
 
 import (
 	"fmt"
-	"github.com/iris-contrib/swagger/v12"
-	"github.com/kataras/iris/v12"
 	"net/http"
 	"new-project/controller/admin"
 	"new-project/controller/api"
@@ -11,6 +9,9 @@ import (
 	"new-project/controller/middleware"
 	_ "new-project/docs"
 	"new-project/pkg/config"
+
+	"github.com/iris-contrib/swagger/v12"
+	"github.com/kataras/iris/v12"
 
 	"github.com/iris-contrib/swagger/v12/swaggerFiles"
 	"github.com/kataras/iris/v12/mvc"
@@ -44,7 +45,8 @@ func Router() {
 		// 前台管理
 		apiRoute := m.Party("/api")
 		apiRoute.Party("/system").Handle(new(api.SystemController))
-		apiRoute.Party("/user").Handle(new(api.UserController)) //用户
+		apiRoute.Party("/user").Handle(new(api.UserController))       //用户
+		apiRoute.Party("/captcha").Handle(new(api.CaptchaController)) //验证码
 
 		// 后台管理
 		adminRoute := m.Party("/admin")
