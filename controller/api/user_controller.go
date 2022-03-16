@@ -45,8 +45,8 @@ type PostLoginCheckRequest struct {
 // @Accept json
 // @Produce json
 // @param root body PostRegisterCheckRequest true "用户注册"
-// @Tags 用户注册
-// @Success 200 {object} app.Response "注册成功"
+// @Tags 用户
+// @Success 200 {object} app.Response{data=JwtResponseData}
 // @Router /api/user/register [post]
 func (this *UserController) PostRegister() *app.Response {
 	params := &PostRegisterCheckRequest{}
@@ -81,14 +81,13 @@ func (this *UserController) PostRegister() *app.Response {
 	})
 }
 
-// Post 获取验证码
-// @Summary 获取验证码
-// @Description 前台获取验证码
+// Post 获取验证码步骤1
+// @Summary 获取验证码信息
+// @Description 前台获取验证码信息
 // @Accept json
 // @Produce json
-// @param root body  true "获取验证码"
-// @Tags 获取验证码
-// @Success 200 {object} app.Response CaptchResponseData{}
+// @Tags 验证码
+// @Success 200 {object} app.Response{data=CaptchResponseData}
 // @Router /api/user/login [get]
 func (this *UserController) GetLogin() *app.Response {
 	capt := util.Captcha(4)
@@ -104,8 +103,8 @@ func (this *UserController) GetLogin() *app.Response {
 // @Accept json
 // @Produce json
 // @param root body PostLoginCheckRequest true "用户登录"
-// @Tags 用户登录
-// @Success 200 {object} app.Response JwtResponseData
+// @Tags 用户
+// @Success 200 {object} app.Response{data=JwtResponseData}
 // @Router /api/user/login [post]
 func (this *UserController) PostLogin() *app.Response {
 	params := &PostLoginCheckRequest{}

@@ -13,6 +13,14 @@ type CaptchaController struct {
 	Ctx iris.Context
 }
 
+// Post 获取验证码图片步骤2
+// @Summary 获取验证码图片
+// @Description 前台获取验证码
+// @Accept json
+// @Produce json
+// @Tags 验证码
+// @Success 200
+// @Router /api/captcha/{captcha_id} [get]
 func (c *CaptchaController) GetBy(captcha_id string) {
 
 	if c.Ctx.URLParam("t") != "" {
