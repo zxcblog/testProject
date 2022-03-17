@@ -20,6 +20,5 @@ func Captcha(len int) *MyCaptchaModel {
 }
 
 func VerifyCaptcha(captchaId, postCaptcha string) bool {
-	success := captcha.VerifyString(captchaId, postCaptcha)
-	return success
+	return captcha.VerifyString(captchaId, postCaptcha)
 }

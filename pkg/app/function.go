@@ -34,3 +34,11 @@ func GetRandString(length int) string {
 	}
 	return rchar
 }
+
+func CacheTimeGenerator(baseMinute, randMinute int64) time.Duration {
+	// 先设置随机数 - 这里比较重要
+	rand.Seed(time.Now().Unix())
+	// 再设置缓存时间
+	// baseMinute分钟 + [0~randMinute) 分钟的随机时间
+	return time.Duration((baseMinute + rand.Int63n(randMinute)) * int64(time.Minute))
+}

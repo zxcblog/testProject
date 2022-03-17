@@ -13,25 +13,20 @@ import (
 // 我们这里需要额外记录一个username字段，所以要自定义结构体
 // 如果想要保存更多信息，都可以添加到这个结构体中
 type MyClaims struct {
-	Username string      `json:"username"`
-	UserInfo models.User `json:"userInfo"`
+	Username string `json:"username"`
 	jwt.StandardClaims
 }
-
-//设置过期时间
-const TokenExpireDuration = time.Hour * 2
 
 //设置本地密钥
 var MySecret = []byte("j6cFIiBsY9jSIxXg")
 
 // GenToken 生成JWT
-func GenToken(user *models.User) (string, error) {
+func GenToken(user *models.User, tokenExpireDuration time.Duration) (string, error) {
 	// 创建一个我们自己的声明
 	c := MyClaims{
 		user.Username, // 自定义字段
-		*user,
 		jwt.StandardClaims{
-			ExpiresAt: time.Now().Add(TokenExpireDuration).Unix(), // 过期时间
+			ExpiresAt: time.Now().Add(tokenExpireDuration).Unix(), // 过期时间
 			IssuedAt:  time.Now().Unix(),                          //发放时间
 			Issuer:    "test-project",                             // 签发人
 		},
