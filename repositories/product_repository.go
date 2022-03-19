@@ -24,3 +24,17 @@ func NewProductRepositories() *productRepositories {
 func (p *productRepositories) Create(db *gorm.DB, product *models.Product) error {
 	return db.Create(product).Error
 }
+
+func (p *productRepositories) GetProductByID(db *gorm.DB, id uint) *models.Product {
+	return p.GetWhereFirst(db.Where("id = ?", id))
+}
+
+// GetWhereFirst 通过条件查找某一个
+func (c *productRepositories) GetWhereFirst(db *gorm.DB) *models.Product {
+	ret := &models.Product{}
+	if err := db.First(ret).Error; err != nil {
+		return nil
+	}
+
+	return ret
+}

@@ -1,9 +1,11 @@
 package admin
 
 import (
+	"new-project/controller/render"
 	"new-project/global"
 	"new-project/models"
 	"new-project/pkg/app"
+	"new-project/pkg/errcode"
 	"new-project/pkg/util"
 	"new-project/services"
 
@@ -42,8 +44,8 @@ type PostProductAddCheckedParams struct {
 // @param root body PostProductAddCheckedParams true "添加商品"
 // @Tags 商品
 // @Success 200 {object} app.Response{}
-// @Router /admin/product/productadd [post]
-func (this *ProductController) PostProductadd() *app.Response {
+// @Router /admin/product [post]
+func (this *ProductController) Post() *app.Response {
 	params := &PostProductAddCheckedParams{}
 
 	if err := app.FormValueJson(this.Ctx, global.Validate, params); err != nil {
@@ -71,10 +73,10 @@ func (this *ProductController) PostProductadd() *app.Response {
 	}
 
 	//插入sku key与value
-	SkuKeyValueSliceData := make([]models.ProductSkuKeyValue, 0)
+	SkuKeyValueSliceData := make([]*models.ProductSkuKeyValue, 0)
 	for _, val := range params.SkuAttributeKeyValueData {
 
-		SkuKeyValueSliceData = append(SkuKeyValueSliceData, models.ProductSkuKeyValue{
+		SkuKeyValueSliceData = append(SkuKeyValueSliceData, &models.ProductSkuKeyValue{
 			ProductId:      product.ID,
 			BrandId:        params.BrandId,
 			AttributeKey:   val.AttributeKey,
@@ -82,26 +84,56 @@ func (this *ProductController) PostProductadd() *app.Response {
 		})
 	}
 	//批量添加规格key和value
-	err = services.ProductSkuKeyValueService.BatchCreate(&SkuKeyValueSliceData)
+	err = services.ProductSkuKeyValueService.BatchCreate(SkuKeyValueSliceData)
 	if err != nil {
 		return app.ToResponseErr(err)
 	}
 
-	SkuSliceData := make([]models.ProductSku, 0)
+	SkuSliceData := make([]*models.ProductSku, 0)
 	//插入组装好的规格数据
 	for _, SkuDataVal := range params.SkuData {
 
-		SkuSliceData = append(SkuSliceData, models.ProductSku{
+		SkuSliceData = append(SkuSliceData, &models.ProductSku{
 			ProductId:    product.ID,
 			SkuAttribute: util.StructToString(SkuDataVal.SkuAttribute),
 			Stock:        SkuDataVal.Stock,
 			Price:        SkuDataVal.Price,
 		})
 	}
-	err = services.ProductSkuService.BatchCreate(&SkuSliceData)
+	err = services.ProductSkuService.BatchCreate(SkuSliceData)
 	if err != nil {
 		return app.ToResponseErr(err)
 	}
 
 	return app.ResponseMsg("添加成功")
+}
+
+// Post 获取商品详情
+// @Summary 获取商品详情
+// @Description 后台管理人员获取商品详情
+// @Produce json
+// @param productId path uint true "商品id"
+// @Tags 商品
+// @Success 200 {object} app.Response{data=app.Result}
+// @Router /admin/product/{productId} [get]
+func (this *ProductController) GetBy(id uint) *app.Response {
+	//商品详情
+	productRes := services.ProductService.Get(id)
+
+	if productRes == nil {
+		return app.ToResponseErr(errcode.NotFound)
+	}
+
+	//sku数据
+	productSkuRes := services.ProductSkuService.GetProductIdAllData(productRes.ID)
+
+	//sku key和value值
+	productSkuValueRes := services.ProductSkuKeyValueService.GetProductIdAllData(productRes.ID)
+
+	return app.ToResponse("获取成功", app.Result{
+		"product":                  render.BuildProduct(productRes),
+		"skuAttributeKeyValueData": render.BuildProductSkuKeyValueList(productSkuValueRes),
+		"skuData":                  render.BuildProductSkuList(productSkuRes),
+	})
+
 }

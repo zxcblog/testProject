@@ -20,6 +20,13 @@ func (p *productSkuRepositories) Create(db *gorm.DB, productSku *models.ProductS
 }
 
 //批量添加
-func (p *productSkuRepositories) BatchCreate(db *gorm.DB, productSku *[]models.ProductSku) error {
+func (p *productSkuRepositories) BatchCreate(db *gorm.DB, productSku []*models.ProductSku) error {
 	return db.Create(productSku).Error
+}
+
+//
+func (p *productSkuRepositories) GetAllData(db *gorm.DB) []*models.ProductSku {
+	listData := make([]*models.ProductSku, 0)
+	db.Model(models.ProductSku{}).Find(&listData)
+	return listData
 }

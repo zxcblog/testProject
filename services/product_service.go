@@ -26,3 +26,7 @@ func (this *productService) Create(product *models.Product) error {
 	}
 	return nil
 }
+
+func (this *productService) Get(id uint) *models.Product {
+	return repositories.ProductRepositories.GetProductByID(global.DB, id)
+}

@@ -6,8 +6,6 @@ import (
 	"new-project/pkg/app"
 	"new-project/pkg/util"
 	"new-project/services"
-
-	"github.com/kataras/iris/v12"
 )
 
 type UserController struct {
@@ -71,7 +69,7 @@ func (this *UserController) PostRegister() *app.Response {
 
 	//返回用户登录信息
 	return app.ToResponse("注册成功", app.Result{
-		"tiken": tokenString,
+		"token": tokenString,
 	})
 }
 
@@ -124,6 +122,6 @@ func (this *UserController) PostLogin() *app.Response {
 
 	//返回参数
 	return app.ToResponse("登录成功", app.Result{
-		"tiken": tokenString,
+		"token": tokenString,
 	})
 }
