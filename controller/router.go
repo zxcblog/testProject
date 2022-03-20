@@ -60,6 +60,14 @@ func Router() {
 
 	})
 
+	// 部分请求使用options协议先进行访问，并在请求头中说明对应的请求方法
+	// 当对应的options请求在路由中没有监听时， 会将路由请求返回并跳转路由
+	// 为了防止这种情况， 使用默认路径来进行缓冲，让iris框架获取请求中的实际请求协议
+	app.Any("{root:path}", func(ctx iris.Context) {
+		// TODO 记录访问不存在的路径以及请求的用户信息
+		ctx.StatusCode(404)
+	})
+
 	// iris.WithoutServerError(iris.ErrServerClosed) 忽略iris框架服务启动时的Listen的错误
 	// iris.WithOptimizations 应用程序会尽可能优化以获得最佳性能
 	app.Run(iris.Addr(":19610"),
