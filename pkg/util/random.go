@@ -11,14 +11,16 @@ import (
 	"time"
 )
 
-var randomChars = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
-var randomNumber = []rune("0123456789")
+var (
+	Chars  = []byte("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789")
+	Number = []byte("0123456789")
+)
 
 var rander = rand.New(rand.NewSource(time.Now().UnixNano()))
 
 //随机生成字符串
-func RandStr(length int, letter []rune) string {
-	b := make([]rune, length)
+func RandStr(length int, letter []byte) string {
+	b := make([]byte, length)
 	randomCharsLen := len(letter)
 
 	for i := range b {
@@ -27,14 +29,22 @@ func RandStr(length int, letter []rune) string {
 	return string(b)
 }
 
+//RandomStr 获取指定长度的字符串
 func RandomStr(length int) string {
-	return RandStr(length, randomChars)
+	return RandStr(length, Chars)
 }
 
+//RandomNumber 获取指定长度的随机数值字符串
 func RandomNumber(length int) string {
-	return RandStr(length, randomNumber)
+	return RandStr(length, Number)
 }
 
+// RandomInt 返回0-length之间的数值
 func RandomInt(length int) int {
 	return rand.Intn(length)
+}
+
+// RandomInt64 返回0-length区间的数值
+func RandomInt64(length int64) int64 {
+	return rand.Int63n(length)
 }

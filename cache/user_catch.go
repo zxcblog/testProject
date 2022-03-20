@@ -22,13 +22,14 @@ func NewUserCache(ctx context.Context, key string) *userCatch {
 }
 
 //设置用户登录缓存信息
-func (this *userCatch) SetUserLoginData(token string, tokenExpireDuration time.Duration, user *models.User) (bool, error) {
+func (this *userCatch) SetUserLoginData(token string, user *models.User) (bool, error) {
 	field := this.key + token
 
 	// 添加缓存
-	res, err := global.Redis.Set(this.ctx, field, util.StructToString(user), tokenExpireDuration).Result()
+	// 设置redis过期时间为2个半小时， 用户在过期半小时以内使用当前token更换新token, 不用重新登录
+	res, err := global.Redis.Set(this.ctx, field, util.StructToString(user), 2*time.Hour+3.*time.Second).Result()
 	if err != nil {
-		global.Logger.Error("分类缓存失败：", zap.Error(err))
+		global.Logger.Error("token缓存用户信息失败：", zap.Error(err))
 		return false, err
 	}
 
