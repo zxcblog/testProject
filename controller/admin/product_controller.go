@@ -137,3 +137,30 @@ func (this *ProductController) GetBy(id uint) *app.Response {
 	})
 
 }
+
+// Get 获取商品列表
+// @Summary 获取商品列表
+// @Description 获取商品列表
+// @Produce json
+// @param productName query string false "商品名称" default("")
+// @param brandId query uint false "品牌id" default(0)
+// @param categoryID query uint false "分类id" default(0)
+// @param page query uint false "分页" default(1)
+// @param pageSize query uint false "分页页数" default(10)
+// @Tags 商品
+// @Success 200 {object} app.Response{data=[]render.Product}
+// @Router /admin/product [get]
+func (this *ProductController) Get() *app.Response {
+	//组装where
+	whereParams := make(map[string]string, 0)
+	whereParams["productName"] = this.Ctx.FormValue("productName")
+	whereParams["categoryID"] = this.Ctx.FormValue("categoryID")
+	whereParams["brandId"] = this.Ctx.FormValue("brandId")
+
+	page := app.GetPage(this.Ctx)
+	pageSize := app.GetPageSize(this.Ctx)
+
+	list, total := services.ProductService.GetListPage(whereParams, page, pageSize)
+
+	return app.ToResponseList(render.BuildProductList(list), total)
+}

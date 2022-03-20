@@ -35,3 +35,15 @@ func BuildProduct(product *models.Product) *Product {
 		Introduction:  product.Introduction,
 	}
 }
+
+func BuildProductList(productList []*models.Product) []*Product {
+	list := make([]*Product, 0)
+	if len(productList) < 1 {
+		return list
+	}
+
+	for _, product := range productList {
+		list = append(list, BuildProduct(product))
+	}
+	return list
+}

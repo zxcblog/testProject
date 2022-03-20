@@ -30,3 +30,7 @@ func (this *productService) Create(product *models.Product) error {
 func (this *productService) Get(id uint) *models.Product {
 	return repositories.ProductRepositories.GetProductByID(global.DB, id)
 }
+
+func (this *productService) GetListPage(params map[string]string, page, pageSize int) ([]*models.Product, int64) {
+	return repositories.ProductRepositories.GetListPage(global.DB, params, page, pageSize)
+}
