@@ -12,7 +12,7 @@ import (
 	"new-project/pkg/config"
 )
 
-func InitRedis(option config.Redis) (*redis.Client, error) {
+func InitRedis(option *config.Redis) (*redis.Client, error) {
 	redisClient := redis.NewClient(&redis.Options{
 		Addr:     option.Host,
 		Password: option.Password,

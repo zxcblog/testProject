@@ -11,6 +11,7 @@ import (
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 	"new-project/pkg/app"
+	"new-project/pkg/upload"
 )
 
 var (
@@ -19,4 +20,5 @@ var (
 	DB        *gorm.DB
 	Validate  *app.Translations
 	Redis     *redis.Client
+	Upload    *upload.Client
 )

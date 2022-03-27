@@ -14,7 +14,7 @@ func FileExists(path string) bool {
 // MkdirOfNotExists 创建文件夹， 不存在就创建
 func MkdirOfNotExists(path string) error {
 	if !FileExists(path) {
-		return os.MkdirAll(path, os.ModePerm)
+		return os.MkdirAll(path, 0644)
 	}
 	return nil
 }

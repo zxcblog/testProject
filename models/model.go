@@ -11,7 +11,7 @@ import (
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/schema"
-	config2 "new-project/pkg/config"
+	"new-project/pkg/config"
 )
 
 type Model struct {
@@ -21,14 +21,14 @@ type Model struct {
 	DeletedAt gorm.DeletedAt `gorm:"index"`
 }
 
-func NewDBEngine(config config2.Database, models ...interface{}) (*gorm.DB, error) {
+func NewDBEngine(option *config.Database, models ...interface{}) (*gorm.DB, error) {
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=%s&parseTime=%t&loc=Local",
-		config.Username, config.Password, config.Host, config.Port, config.DBName, config.Charset, config.ParseTime,
+		option.Username, option.Password, option.Host, option.Port, option.DBName, option.Charset, option.ParseTime,
 	)
 
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
 		NamingStrategy: schema.NamingStrategy{
-			TablePrefix:   config.TablePrefix, // 表前缀
+			TablePrefix:   option.TablePrefix, // 表前缀
 			SingularTable: true,               // 使用单表复数名
 		},
 		DisableForeignKeyConstraintWhenMigrating: true, // 禁用外键约束
@@ -42,8 +42,8 @@ func NewDBEngine(config config2.Database, models ...interface{}) (*gorm.DB, erro
 		return nil, err
 	}
 
-	sqlDB.SetMaxIdleConns(config.MaxIdleConns) // SetMaxIdleConns 设置空闲连接池中连接的最大数量
-	sqlDB.SetMaxOpenConns(config.MaxOpenConns) // SetMaxOpenConns 设置打开数据库连接的最大数量。
+	sqlDB.SetMaxIdleConns(option.MaxIdleConns) // SetMaxIdleConns 设置空闲连接池中连接的最大数量
+	sqlDB.SetMaxOpenConns(option.MaxOpenConns) // SetMaxOpenConns 设置打开数据库连接的最大数量。
 
 	if err = db.Set("gorm:table_options", "ENGINE=InnoDB").AutoMigrate(models...); err != nil {
 		return nil, fmt.Errorf("自动化生成表失败：%s", err.Error())

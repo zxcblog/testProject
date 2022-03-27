@@ -21,4 +21,4 @@ log
 storage
 docs
 bin
-/pkg/config/config.yaml
+config.yaml

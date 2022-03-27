@@ -4,12 +4,14 @@ import (
 	"fmt"
 	"gopkg.in/yaml.v3"
 	"io/ioutil"
+	"new-project/pkg/util"
 )
 
 type Service struct {
 	DebugMode            bool     `yaml:"DebugMode"`
 	MaxPageSize          int      `yaml:"MaxPageSize"`
 	MinPageSize          int      `yaml:"MinPageSize"`
+	UploadChunkSize      int      `yaml:"UploadChunkSize"`
 	Host                 string   `yaml:"Host"`
 	UploadSavePath       string   `yaml:"UploadSavePath"`
 	UploadImgMaxSize     float64  `yaml:"UploadMaxImgSize"`
@@ -45,29 +47,45 @@ type Redis struct {
 	DefaultDB int    `yaml:"DefaultDB"`
 }
 
+type Oss struct {
+	Endpoint        string `yaml:"Endpoint"`
+	AccessKeyID     string `yaml:"AccessKeyID"`
+	AccessKeySecret string `yaml:"AccessKeySecret"`
+	BucketName      string `yaml:"BucketName"`
+}
+
 type Config struct {
-	Service Service  `yaml:"Service"`
-	Logger  Logger   `yaml:"Logger"`
-	DB      Database `yaml:"DB"`
-	Redis   Redis    `yaml:"Redis"`
+	Service *Service  `yaml:"Service"`
+	Logger  *Logger   `yaml:"Logger"`
+	DB      *Database `yaml:"DB"`
+	Redis   *Redis    `yaml:"Redis"`
+	Oss     *Oss      `yaml:"Oss"`
 }
 
 var config Config
 
-func GetService() Service {
+func GetService() *Service {
 	return config.Service
 }
 
-func GetLogger() Logger {
+func (service *Service) GetChunkSize() uint {
+	return uint(service.UploadChunkSize * util.MB)
+}
+
+func GetLogger() *Logger {
 	return config.Logger
 }
 
-func GetDB() Database {
+func GetDB() *Database {
 	return config.DB
 }
 
-func GetRedis() Redis {
+func GetRedis() *Redis {
 	return config.Redis
+}
+
+func GetOss() *Oss {
+	return config.Oss
 }
 
 func InitConfig(path string) {

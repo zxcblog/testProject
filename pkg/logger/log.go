@@ -7,11 +7,11 @@ import (
 	"new-project/pkg/config"
 )
 
-func NewLogger(log config.Logger) *zap.Logger {
+func NewLogger(log *config.Logger) *zap.Logger {
 	return InitLogger(log.DebugFile, log.MaxSize, log.MaxAge, zap.ErrorLevel)
 }
 
-func NewAccessLogger(log config.Logger) *zap.Logger {
+func NewAccessLogger(log *config.Logger) *zap.Logger {
 	return InitLogger(log.AccessFile, log.MaxSize, log.MaxAge, zap.InfoLevel)
 }
 

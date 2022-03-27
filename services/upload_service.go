@@ -1,10 +1,13 @@
 package services
 
 import (
+	"errors"
 	"fmt"
 	"go.uber.org/zap"
 	"io"
+	"math"
 	"mime/multipart"
+	"new-project/cache"
 	"new-project/global"
 	"new-project/models"
 	"new-project/pkg/config"
@@ -88,4 +91,30 @@ func (*uploadService) Upload(file multipart.File, fileHeader *multipart.FileHead
 	}
 
 	return upload, nil
+}
+
+//InitialMultipart 初始化分片上传元信息
+func (*uploadService) InitialMultipart(fileSize uint, fileName, fileType string) (string, int, error) {
+	fileExt := fileName[strings.LastIndex(fileName, ".")+1:] // 通过文件名获取文件后缀
+	newfileName := util.RandomStr(32) + "." + fileExt
+
+	model := &models.Upload{
+		FileSize: fileSize,
+		OldName:  fileName,
+		NewName:  newfileName,
+		FileType: fileType,
+		FileExt:  fileExt,
+	}
+
+	// 根据大小设置文件分块数量
+	chunkNum := int(math.Ceil(float64(fileSize / config.GetService().GetChunkSize())))
+	imur, err := global.Upload.InitiateMultipart(newfileName)
+	if err != nil {
+		global.Logger.Error("文件元信息分块初始化失败", zap.Error(err))
+		return "", 0, errors.New("文件上传失败")
+	}
+
+	cache.UploadCache.InitiateMultipart(model, imur, chunkNum)
+
+	return imur.UploadID, chunkNum, nil
 }

@@ -3,6 +3,7 @@ module new-project
 go 1.17
 
 require (
+	github.com/aliyun/aliyun-oss-go-sdk v2.2.2+incompatible // indirect
 	github.com/go-playground/validator/v10 v10.10.0 // indirect
 	github.com/iris-contrib/swagger/v12 v12.0.1 // indirect
 	github.com/kataras/iris/v12 v12.2.0-alpha6.0.20220221205027-8ded69fd7ed2 // indirect
