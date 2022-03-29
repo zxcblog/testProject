@@ -1,13 +1,16 @@
 package comm
 
 import (
+	"fmt"
 	"github.com/kataras/iris/v12"
+	"new-project/cache"
 	"new-project/controller/render"
 	"new-project/global"
 	"new-project/pkg/app"
 	"new-project/pkg/config"
 	"new-project/pkg/errcode"
 	"new-project/services"
+	"time"
 )
 
 type UploadController struct {
@@ -41,7 +44,7 @@ type InitiateMultipart struct {
 	FileSize uint   `validate:"required,min=102400,max=536870912000" label:"文件大小" json:"fileSize"` // 文件大小 最小不能小于100KB 最大不能超过500GB
 	FileName string `validate:"required" label:"文件名" json:"fileName"`                              // 文件名
 	FileType string `validate:"required" label:"文件类型" json:"FileType"`                             // 文件类型
-	MD5Check string `validate:"required" label:"md5校验码" json:"MD5Check"`
+	//MD5Check string `validate:"required" label:"md5校验码" json:"MD5Check"`
 }
 
 // PostInitiateMultipart 大文件分块上传元信息
@@ -72,44 +75,62 @@ func (this *UploadController) PostInitiateMultipart() *app.Response {
 	})
 }
 
-//// PostPartUpload 文件分块信息
-//// @Summary 文件分块信息
-//// @Description 文件分块信息
-//// @Accept mpfd
-//// @Produce json
-//// @param file formData file true "文件"
-//// @Tags 文件上传
-//// @Success 200 {object} app.Response{data=render.Upload}
-//// @Router /comm/upload [post]
-//func (this *UploadController) PostPartUpload() *app.Response {
-//	// 本地hash值和服务器hash值进行校验
-//
-//	// 获得文件句柄， 用于存储分块内容
-//
-//	// 更新redis缓存状态
-//
-//	return nil
-//}
-//
-//// PostComplete 通知上传完成合并操作
-//// @Summary 通知上传完成合并操作
-//// @Description 通知上传完成合并操作
-//// @Accept mpfd
-//// @Produce json
-//// @param file formData file true "文件"
-//// @Tags 文件上传
-//// @Success 200 {object} app.Response{data=render.Upload}
-//// @Router /comm/upload [post]
-//func (this *UploadController) PostComplete() *app.Response {
-//	// 通过uploadId查询redis并判断是否所有分块上传完成
-//
-//	// 合并分块
-//
-//	// 更新唯一文件表
-//
-//	// 响应处理结果
-//	return nil
-//}
+// PostPartBy 上传文件分块信息
+// @Summary 上传文件分块信息
+// @Description 上传文件分块信息
+// @Accept mpfd
+// @Produce json
+// @param uploadId path string true "文件uploadId"
+// @param num path int true "上传片"
+// @param file formData file true "文件"
+// @Tags 文件上传
+// @Success 200 {object} app.Response{data=render.Upload}
+// @Router /comm/upload/part/{U} [post]
+func (this *UploadController) PostPartBy(uploadId string, num int) *app.Response {
+	startTime := time.Now().UnixMilli()
+	file, fileHeader, err := this.Ctx.FormFile("file")
+	if err != nil {
+		return app.ToResponseErr(errcode.UploadFileError.SetMsg(err.Error()))
+	}
+	defer file.Close()
+	fmt.Println("文件获取时间:", time.Now().UnixMilli()-startTime)
+	fmt.Println(fileHeader.Size)
+
+	startTime = time.Now().UnixMilli()
+	imur := cache.UploadCache.GetImur(uploadId)
+	fmt.Println("缓存获取时间:", time.Now().UnixMilli()-startTime)
+
+	startTime = time.Now().UnixMilli()
+	res, err := global.Upload.Bucket.UploadPart(*imur, file, fileHeader.Size, num)
+	fmt.Println("分片上传时间:", time.Now().UnixMilli()-startTime)
+	if err != nil {
+		return app.ToResponseErr(err)
+	}
+
+	cache.UploadCache.SetUploadParts(uploadId, res)
+
+	return app.ResponseData(res)
+}
+
+// PostCompleteBy 通知上传完成合并操作
+// @Summary 通知上传完成合并操作
+// @Description 通知上传完成合并操作
+// @Accept mpfd
+// @Produce json
+// @param uploadId path string true "文件uploadId"
+// @Tags 文件上传
+// @Success 200 {object} app.Response{data=render.Upload}
+// @Router /comm/upload/complete/{uploadId} [post]
+func (this *UploadController) GetCompleteBy(uploadId string) *app.Response {
+	parts := cache.UploadCache.GetUploadParts(uploadId)
+	imur := cache.UploadCache.GetImur(uploadId)
+
+	res, err := global.Upload.Bucket.CompleteMultipartUpload(*imur, parts)
+	if err != nil {
+		return app.ToResponseErr(err)
+	}
+	return app.ResponseData(res)
+}
 
 //func (this *UploadController) GetBy(id uint) {
 //upload := services.UploadService.Get(id)

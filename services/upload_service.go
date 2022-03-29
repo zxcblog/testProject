@@ -107,7 +107,7 @@ func (*uploadService) InitialMultipart(fileSize uint, fileName, fileType string)
 	}
 
 	// 根据大小设置文件分块数量
-	chunkNum := int(math.Ceil(float64(fileSize / config.GetService().GetChunkSize())))
+	chunkNum := int(math.Ceil(float64(fileSize) / float64(config.GetService().GetChunkSize())))
 	imur, err := global.Upload.InitiateMultipart(newfileName)
 	if err != nil {
 		global.Logger.Error("文件元信息分块初始化失败", zap.Error(err))
