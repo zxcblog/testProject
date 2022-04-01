@@ -2,6 +2,7 @@ package cache
 
 import (
 	"context"
+	"fmt"
 	"github.com/aliyun/aliyun-oss-go-sdk/oss"
 	"new-project/global"
 	"new-project/models"
@@ -42,6 +43,7 @@ func (*uploadCache) GetImur(uploadId string) *oss.InitiateMultipartUploadResult 
 
 func (this *uploadCache) SetUploadParts(uploadId string, part oss.UploadPart) {
 	parts := this.GetUploadParts(uploadId)
+	fmt.Println(parts)
 	parts = append(parts, part)
 
 	global.Redis.Set(context.Background(), uploadPrefix+uploadId+"parts", util.StructToString(parts), 48*time.Hour)
@@ -50,10 +52,13 @@ func (this *uploadCache) SetUploadParts(uploadId string, part oss.UploadPart) {
 func (*uploadCache) GetUploadParts(uploadId string) []oss.UploadPart {
 	parts := make([]oss.UploadPart, 0)
 	if flag, _ := global.Redis.Exists(context.Background(), uploadPrefix+uploadId+"parts").Result(); flag != 1 {
+		fmt.Println("没有上传文件列表")
 		return parts
 	}
 
-	str, _ := global.Redis.Get(context.Background(), uploadPrefix+uploadId+"parts").Result()
-	util.StringToStruct(str, parts)
+	str, err := global.Redis.Get(context.Background(), uploadPrefix+uploadId+"parts").Result()
+	fmt.Println("上传文件列表读取信息", str)
+	fmt.Println("上传文件列表读取信息", err)
+	util.StringToStruct(str, &parts)
 	return parts
 }

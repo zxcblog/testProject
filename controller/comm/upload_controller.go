@@ -1,6 +1,7 @@
 package comm
 
 import (
+	"bytes"
 	"fmt"
 	"github.com/kataras/iris/v12"
 	"new-project/cache"
@@ -101,14 +102,18 @@ func (this *UploadController) PostPartBy(uploadId string, num int) *app.Response
 	fmt.Println("缓存获取时间:", time.Now().UnixMilli()-startTime)
 
 	startTime = time.Now().UnixMilli()
-	res, err := global.Upload.Bucket.UploadPart(*imur, file, fileHeader.Size, num)
+	content := make([]byte, fileHeader.Size)
+	_, err = file.Read(content)
+	fmt.Println("文件读取错误：", err)
+
+	res, err := global.Upload.Bucket.UploadPart(*imur, bytes.NewReader(content), fileHeader.Size, num)
 	fmt.Println("分片上传时间:", time.Now().UnixMilli()-startTime)
+	fmt.Println(res, err)
 	if err != nil {
 		return app.ToResponseErr(err)
 	}
 
 	cache.UploadCache.SetUploadParts(uploadId, res)
-
 	return app.ResponseData(res)
 }
 
