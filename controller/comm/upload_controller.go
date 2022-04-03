@@ -19,14 +19,14 @@ type UploadController struct {
 }
 
 // Post 单个文件上传
-// @Summary 单个文件上传
-// @Description 单个文件上传
-// @Accept mpfd
-// @Produce json
-// @param file formData file true "文件"
-// @Tags 文件上传
-// @Success 200 {object} app.Response{data=render.Upload}
-// @Router /comm/upload [post]
+// @Summary      单个文件上传
+// @Description  单个文件上传
+// @Accept       mpfd
+// @Produce      json
+// @param        file  formData  file  true  "文件"
+// @Tags         文件上传
+// @Success      200  {object}  app.Response{data=render.Upload}
+// @Router       /comm/upload [post]
 func (this *UploadController) Post() *app.Response {
 	file, fileHeader, err := this.Ctx.FormFile("file")
 	if err != nil {
@@ -49,14 +49,14 @@ type InitiateMultipart struct {
 }
 
 // PostInitiateMultipart 大文件分块上传元信息
-// @Summary 大文件分块上传元信息
-// @Description 大文件分块上传元信息
-// @Accept json
-// @Produce json
-// @param root body InitiateMultipart true "文件上传元信息"
-// @Tags 文件上传
-// @Success 200 {object} app.Response
-// @Router /comm/upload/initiate/multipart [post]
+// @Summary      大文件分块上传元信息
+// @Description  大文件分块上传元信息
+// @Accept       json
+// @Produce      json
+// @param        root  body  InitiateMultipart  true  "文件上传元信息"
+// @Tags         文件上传
+// @Success      200  {object}  app.Response
+// @Router       /comm/upload/initiate/multipart [post]
 func (this *UploadController) PostInitiateMultipart() *app.Response {
 	param := &InitiateMultipart{}
 	if err := app.FormValueJson(this.Ctx, global.Validate, param); err != nil {
@@ -77,16 +77,16 @@ func (this *UploadController) PostInitiateMultipart() *app.Response {
 }
 
 // PostPartBy 上传文件分块信息
-// @Summary 上传文件分块信息
-// @Description 上传文件分块信息
-// @Accept mpfd
-// @Produce json
-// @param uploadId path string true "文件uploadId"
-// @param num path int true "上传片"
-// @param file formData file true "文件"
-// @Tags 文件上传
-// @Success 200 {object} app.Response{data=render.Upload}
-// @Router /comm/upload/part/{U} [post]
+// @Summary      上传文件分块信息
+// @Description  上传文件分块信息
+// @Accept       mpfd
+// @Produce      json
+// @param        uploadId  path      string  true  "文件uploadId"
+// @param        num       path      int     true  "上传片"
+// @param        file      formData  file    true  "文件"
+// @Tags         文件上传
+// @Success      200  {object}  app.Response{data=render.Upload}
+// @Router       /comm/upload/part/{U} [post]
 func (this *UploadController) PostPartBy(uploadId string, num int) *app.Response {
 	startTime := time.Now().UnixMilli()
 	file, fileHeader, err := this.Ctx.FormFile("file")
@@ -118,14 +118,14 @@ func (this *UploadController) PostPartBy(uploadId string, num int) *app.Response
 }
 
 // PostCompleteBy 通知上传完成合并操作
-// @Summary 通知上传完成合并操作
-// @Description 通知上传完成合并操作
-// @Accept mpfd
-// @Produce json
-// @param uploadId path string true "文件uploadId"
-// @Tags 文件上传
-// @Success 200 {object} app.Response{data=render.Upload}
-// @Router /comm/upload/complete/{uploadId} [post]
+// @Summary      通知上传完成合并操作
+// @Description  通知上传完成合并操作
+// @Accept       mpfd
+// @Produce      json
+// @param        uploadId  path  string  true  "文件uploadId"
+// @Tags         文件上传
+// @Success      200  {object}  app.Response{data=render.Upload}
+// @Router       /comm/upload/complete/{uploadId} [post]
 func (this *UploadController) GetCompleteBy(uploadId string) *app.Response {
 	parts := cache.UploadCache.GetUploadParts(uploadId)
 	imur := cache.UploadCache.GetImur(uploadId)

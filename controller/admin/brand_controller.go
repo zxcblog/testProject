@@ -29,14 +29,14 @@ type BrandRequest struct {
 }
 
 // Post 添加商品品牌
-// @Summary 添加商品品牌
-// @Description 后台管理人员添加商品品牌
-// @Accept json
-// @Produce json
-// @param root body BrandRequest true "添加商品品牌"
-// @Tags 品牌
-// @Success 200 {object} app.Response{data=render.Brand}
-// @Router /admin/brand [post]
+// @Summary      添加商品品牌
+// @Description  后台管理人员添加商品品牌
+// @Accept       json
+// @Produce      json
+// @param        root  body  BrandRequest  true  "添加商品品牌"
+// @Tags         品牌
+// @Success      200  {object}  app.Response{data=render.Brand}
+// @Router       /admin/brand [post]
 func (b *BrandController) Post() *app.Response {
 	param := &BrandRequest{}
 	if err := app.FormValueJson(b.Ctx, global.Validate, param); err != nil {
@@ -57,15 +57,15 @@ func (b *BrandController) Post() *app.Response {
 }
 
 // Get 获取品牌列表
-// @Summary 获取品牌列表
-// @Description 获取品牌列表
-// @Produce json
-// @param categoryID query uint false "分类id" default(0)
-// @param page query uint false "分页" default(1)
-// @param pageSize query uint false "分页页数" default(10)
-// @Tags 品牌
-// @Success 200 {object} app.Response{data=[]render.Brand}
-// @Router /admin/brand [get]
+// @Summary      获取品牌列表
+// @Description  获取品牌列表
+// @Produce      json
+// @param        categoryID  query  uint  false  "分类id"  default(0)
+// @param        page        query  uint  false  "分页"    default(1)
+// @param        pageSize    query  uint  false  "分页页数"  default(10)
+// @Tags         品牌
+// @Success      200  {object}  app.Response{data=[]render.Brand}
+// @Router       /admin/brand [get]
 func (b *BrandController) Get() *app.Response {
 	categoryID := app.FormValueUintDefault(b.Ctx, "categoryID", 0)
 	page := app.GetPage(b.Ctx)
@@ -76,13 +76,13 @@ func (b *BrandController) Get() *app.Response {
 }
 
 // GetBy 通过id获取品牌信息
-// @Summary 获取品牌详情
-// @Description 通过品牌id获取品牌详情
-// @Produce json
-// @param brandID path uint true "品牌id"
-// @tags 品牌
-// @Success 200 {object} app.Response{data=render.Brand}
-// @Router /admin/brand/{brandID} [get]
+// @Summary      获取品牌详情
+// @Description  通过品牌id获取品牌详情
+// @Produce      json
+// @param        brandID  path  uint  true  "品牌id"
+// @tags         品牌
+// @Success      200  {object}  app.Response{data=render.Brand}
+// @Router       /admin/brand/{brandID} [get]
 func (b *BrandController) GetBy(id uint) *app.Response {
 	res := services.BrandService.Get(id)
 
@@ -93,15 +93,15 @@ func (b *BrandController) GetBy(id uint) *app.Response {
 }
 
 // PutBy 修改品牌信息
-// @Summary 修改品牌信息
-// @Description 修改品牌信息
-// @Accept json
-// @Produce json
-// @param brandID path uint true "品牌ID"
-// @param root body BrandRequest true "修改品牌信息"
-// @Tags 品牌
-// @Success 200 {object} app.Response{data=render.Brand}
-// @Router /admin/brand/{brandID} [put]
+// @Summary      修改品牌信息
+// @Description  修改品牌信息
+// @Accept       json
+// @Produce      json
+// @param        brandID  path  uint          true  "品牌ID"
+// @param        root     body  BrandRequest  true  "修改品牌信息"
+// @Tags         品牌
+// @Success      200  {object}  app.Response{data=render.Brand}
+// @Router       /admin/brand/{brandID} [put]
 func (b *BrandController) PutBy(id uint) *app.Response {
 	brand := services.BrandService.Get(id)
 	if brand == nil {
@@ -125,13 +125,13 @@ func (b *BrandController) PutBy(id uint) *app.Response {
 }
 
 // DeleteBy 删除品牌信息
-// @Summary 删除品牌信息
-// @Description 删除品牌信息
-// @Produce json
-// @param brandID path uint true "品牌ID"
-// @Tags 品牌
-// @Success 200 {object} app.Response
-// @Router /admin/brand/{brandID} [delete]
+// @Summary      删除品牌信息
+// @Description  删除品牌信息
+// @Produce      json
+// @param        brandID  path  uint  true  "品牌ID"
+// @Tags         品牌
+// @Success      200  {object}  app.Response
+// @Router       /admin/brand/{brandID} [delete]
 func (b *BrandController) DeleteBy(id uint) *app.Response {
 	if err := services.BrandService.Delete(id); err != nil {
 		return app.ToResponseErr(err)

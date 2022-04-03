@@ -37,14 +37,14 @@ type PostProductAddCheckedParams struct {
 }
 
 // Post 添加商品
-// @Summary 添加商品
-// @Description 后台管理人员添加商品
-// @Accept json
-// @Produce json
-// @param root body PostProductAddCheckedParams true "添加商品"
-// @Tags 商品
-// @Success 200 {object} app.Response{}
-// @Router /admin/product [post]
+// @Summary      添加商品
+// @Description  后台管理人员添加商品
+// @Accept       json
+// @Produce      json
+// @param        root  body  PostProductAddCheckedParams  true  "添加商品"
+// @Tags         商品
+// @Success      200  {object}  app.Response{}
+// @Router       /admin/product [post]
 func (this *ProductController) Post() *app.Response {
 	params := &PostProductAddCheckedParams{}
 
@@ -109,13 +109,13 @@ func (this *ProductController) Post() *app.Response {
 }
 
 // Post 获取商品详情
-// @Summary 获取商品详情
-// @Description 后台管理人员获取商品详情
-// @Produce json
-// @param productId path uint true "商品id"
-// @Tags 商品
-// @Success 200 {object} app.Response{data=app.Result}
-// @Router /admin/product/{productId} [get]
+// @Summary      获取商品详情
+// @Description  后台管理人员获取商品详情
+// @Produce      json
+// @param        productId  path  uint  true  "商品id"
+// @Tags         商品
+// @Success      200  {object}  app.Response{data=app.Result}
+// @Router       /admin/product/{productId} [get]
 func (this *ProductController) GetBy(id uint) *app.Response {
 	//商品详情
 	productRes := services.ProductService.Get(id)
@@ -139,17 +139,17 @@ func (this *ProductController) GetBy(id uint) *app.Response {
 }
 
 // Get 获取商品列表
-// @Summary 获取商品列表
-// @Description 获取商品列表
-// @Produce json
-// @param productName query string false "商品名称" default("")
-// @param brandId query uint false "品牌id" default(0)
-// @param categoryID query uint false "分类id" default(0)
-// @param page query uint false "分页" default(1)
-// @param pageSize query uint false "分页页数" default(10)
-// @Tags 商品
-// @Success 200 {object} app.Response{data=[]render.Product}
-// @Router /admin/product [get]
+// @Summary      获取商品列表
+// @Description  获取商品列表
+// @Produce      json
+// @param        productName  query  string  false  "商品名称"  default("")
+// @param        brandId      query  uint    false  "品牌id"  default(0)
+// @param        categoryID   query  uint    false  "分类id"  default(0)
+// @param        page         query  uint    false  "分页"    default(1)
+// @param        pageSize     query  uint    false  "分页页数"  default(10)
+// @Tags         商品
+// @Success      200  {object}  app.Response{data=[]render.Product}
+// @Router       /admin/product [get]
 func (this *ProductController) Get() *app.Response {
 	//组装where
 	whereParams := make(map[string]string, 0)

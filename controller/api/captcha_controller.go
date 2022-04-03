@@ -15,24 +15,24 @@ type CaptchaController struct {
 }
 
 // Get 获取验证码id
-// @Summary 获取验证码id
-// @Description 获取验证码id
-// @Produce json
-// @Tags 验证码
-// @Success 200 {object} app.Response{data=string}
-// @Router /api/captcha [get]
+// @Summary      获取验证码id
+// @Description  获取验证码id
+// @Produce      json
+// @Tags         验证码
+// @Success      200  {object}  app.Response{data=string}
+// @Router       /api/captcha [get]
 func (this *CaptchaController) Get() *app.Response {
 	return app.ResponseData(services.CaptchaService.GetCaptchaID(this.Ctx))
 }
 
 // GetBy 通过验证码ID获取到图片
-// @Summary 通过验证码ID获取到图片
-// @Description 通过验证码ID获取到图片
-// @param refresh query bool false "是否刷新验证码"
-// @Produce json
-// @Tags 验证码
-// @Success 200
-// @Router /api/captcha/{captchaId} [get]
+// @Summary      通过验证码ID获取到图片
+// @Description  通过验证码ID获取到图片
+// @param        refresh  query  bool  false  "是否刷新验证码"
+// @Produce      json
+// @Tags         验证码
+// @Success      200
+// @Router       /api/captcha/{captchaId} [get]
 func (this *CaptchaController) GetBy(captchaId string) *app.Response {
 	refresh, _ := this.Ctx.URLParamBool("refresh")
 	var content bytes.Buffer
