@@ -11,8 +11,9 @@ require (
 	github.com/streadway/amqp v1.0.0 // indirect
 	github.com/swaggo/swag v1.8.0 // indirect
 	go.uber.org/zap v1.21.0 // indirect
+	gorm.io/datatypes v1.0.6 // indirect
 	gorm.io/driver/mysql v1.3.2 // indirect
-	gorm.io/gorm v1.23.1 // indirect
+	gorm.io/gorm v1.23.2 // indirect
 )
 
 require (
