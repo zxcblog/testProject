@@ -23,8 +23,9 @@ func Router() {
 	app := iris.New()
 	app.Use(cors.New(cors.Options{
 		AllowedOrigins:   []string{"*"},
+		AllowedMethods:   []string{http.MethodPost, http.MethodGet, http.MethodPut, http.MethodOptions, http.MethodDelete},
+		AllowedHeaders:   []string{"Authorization"},
 		AllowCredentials: true,
-		AllowedMethods:   []string{http.MethodGet, http.MethodPost, http.MethodPut, http.MethodDelete},
 		Debug:            config.GetService().DebugMode,
 	}))
 
@@ -39,14 +40,13 @@ func Router() {
 		app.Get("/swagger", swaggerUI)
 	}
 
-	mvc.Configure(app, func(m *mvc.Application) {
+	mvc.Configure(app.Party("/api"), func(m *mvc.Application) {
 		m.Router.Use(middleware.AccessLog) // 访问日志中间件
 		//m.Router.Use(middleware.Limiter)   // 限流
 		// 前台管理
-		apiRoute := m.Party("/api")
-		apiRoute.Party("/system").Handle(new(api.SystemController))
-		apiRoute.Party("/user").Handle(new(api.UserController))       //用户
-		apiRoute.Party("/captcha").Handle(new(api.CaptchaController)) //验证码
+		m.Party("/system").Handle(new(api.SystemController))
+		m.Party("/user").Handle(new(api.UserController))       //用户
+		m.Party("/captcha").Handle(new(api.CaptchaController)) //验证码
 
 		// 后台管理
 		adminRoute := m.Party("/admin")
