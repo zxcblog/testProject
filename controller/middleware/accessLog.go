@@ -2,7 +2,6 @@ package middleware
 
 import (
 	"bytes"
-	"fmt"
 	"github.com/kataras/iris/v12"
 	"io/ioutil"
 	"net/http"
@@ -28,7 +27,6 @@ func AccessLog(ctx iris.Context) {
 
 	contentType := ctx.GetHeader("Content-Type")
 	if !strings.HasPrefix(contentType, "multipart/form-data") && (method == http.MethodPost || method == http.MethodPut) {
-		fmt.Println(contentType, 123456789)
 		body, err := ioutil.ReadAll(ctx.Request().Body)
 		if err == nil {
 			defer ctx.Request().Body.Close()

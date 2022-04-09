@@ -24,7 +24,7 @@ func Router() {
 	app.Use(cors.New(cors.Options{
 		AllowedOrigins:   []string{"*"},
 		AllowedMethods:   []string{http.MethodPost, http.MethodGet, http.MethodPut, http.MethodOptions, http.MethodDelete},
-		AllowedHeaders:   []string{"Authorization"},
+		AllowedHeaders:   []string{"Authorization", "Content-Type"},
 		AllowCredentials: true,
 		Debug:            config.GetService().DebugMode,
 	}))

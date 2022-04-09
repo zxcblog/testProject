@@ -17,7 +17,10 @@ import (
 // @termsOfService  http://1.14.127.213:19610
 
 // @host      127.0.0.1:19610
-// @BasePath  /
+// @BasePath  /api
+// @securityDefinitions.apikey ApiKeyAuth
+// @in header
+// @name Authorization
 func main() {
 	// 读取配置文件
 	config.InitConfig("./config.yml")

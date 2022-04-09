@@ -15,7 +15,7 @@ type SystemController struct {
 // @Produce      json
 // @Tags         system
 // @Success      200  {object}  app.Response  pong
-// @Router       /api/system/ping [get]
+// @Router       /system/ping [get]
 func (t *SystemController) GetPing() *app.Response {
 	return app.ResponseMsg("pong")
 }

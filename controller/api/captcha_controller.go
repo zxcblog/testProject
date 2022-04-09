@@ -20,7 +20,7 @@ type CaptchaController struct {
 // @Produce      json
 // @Tags         验证码
 // @Success      200  {object}  app.Response{data=string}
-// @Router       /api/captcha [get]
+// @Router       /captcha [get]
 func (this *CaptchaController) Get() *app.Response {
 	return app.ResponseData(services.CaptchaService.GetCaptchaID(this.Ctx))
 }
@@ -32,7 +32,7 @@ func (this *CaptchaController) Get() *app.Response {
 // @Produce      json
 // @Tags         验证码
 // @Success      200
-// @Router       /api/captcha/{captchaId} [get]
+// @Router       /captcha/{captchaId} [get]
 func (this *CaptchaController) GetBy(captchaId string) *app.Response {
 	refresh, _ := this.Ctx.URLParamBool("refresh")
 	var content bytes.Buffer

@@ -33,7 +33,7 @@ type PostRegisterCheckRequest struct {
 // @param        userName  path  string  true  "账号"
 // @Tags         用户
 // @Success      200  {object}  app.Response{data=bool}
-// @Router       /api/user/unique/{userName} [post]
+// @Router       /user/unique/{userName} [post]
 func (this *UserController) PostUniqueBy(userName string) *app.Response {
 	return app.ResponseData(services.UserService.UniqueByName(userName))
 }
@@ -46,7 +46,7 @@ func (this *UserController) PostUniqueBy(userName string) *app.Response {
 // @param        root  body  PostRegisterCheckRequest  true  "用户注册"
 // @Tags         用户
 // @Success      200  {object}  app.Response{data=app.Result{token=services.Token,user=render.User}}
-// @Router       /api/user/register [post]
+// @Router       /user/register [post]
 func (this *UserController) PostRegister() *app.Response {
 	//参数校验 && 绑定参数
 	params := &PostRegisterCheckRequest{}
@@ -94,7 +94,7 @@ type PostLoginCheckRequest struct {
 // @param        root  body  PostLoginCheckRequest  true  "用户登录"
 // @Tags         用户
 // @Success      200  {object}  app.Response{data=app.Result}
-// @Router       /api/user/login [post]
+// @Router       /user/login [post]
 func (this *UserController) PostLogin() *app.Response {
 	params := &PostLoginCheckRequest{}
 	if err := app.FormValueJson(this.Ctx, global.Validate, params); err != nil {

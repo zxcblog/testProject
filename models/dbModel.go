@@ -61,11 +61,11 @@ type ProductSku struct {
 	Model
 	ProductId    uint   `gorm:"index:idx_sku_shop_product_id;comment:商品id"`
 	SkuAttribute string `gorm:"type:text;comment:商品规格组合数据"`
-	Stock        uint   `gorm:"dedault:1;comment:库存"`
-	Price        uint   `gorm:"dedault:1;comment:价格"`
+	Stock        uint   `gorm:"default:1;comment:库存"`
+	Price        uint   `gorm:"default:1;comment:价格"`
 }
 
-// ProductSku 商品sku属性key和value表
+// ProductSkuKeyValue 商品sku属性key和value表
 type ProductSkuKeyValue struct {
 	Model
 	ProductId      uint   `gorm:"index:idx_sku_key_shop_product_id;comment:商品id"`
@@ -77,6 +77,7 @@ type ProductSkuKeyValue struct {
 // Upload 文件上传保存
 type Upload struct {
 	Model
+	UserId   uint   `gorm:"index:idx_upload_user_id;default:0;comment:用户id"`
 	FileSize uint   `gorm:"default:0;comment:文件大小"`
 	SavePath string `gorm:"size:512;comment:文件保存地址"`
 	OldName  string `gorm:"size:512;comment:文件原名称"`

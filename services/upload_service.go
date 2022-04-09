@@ -1,6 +1,7 @@
 package services
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"go.uber.org/zap"
@@ -10,6 +11,7 @@ import (
 	"new-project/cache"
 	"new-project/global"
 	"new-project/models"
+	"new-project/models/form"
 	"new-project/pkg/config"
 	"new-project/pkg/errcode"
 	"new-project/pkg/util"
@@ -32,6 +34,7 @@ func (*uploadService) Get(id uint) *models.Upload {
 	return repositories.UploadRepositories.Get(global.DB, id)
 }
 
+// Upload 上传文件
 func (*uploadService) Upload(file multipart.File, fileHeader *multipart.FileHeader) (*models.Upload, error) {
 	// 通过文件名获取文件后缀
 	fileExt := fileHeader.Filename[strings.LastIndex(fileHeader.Filename, ".")+1:]
@@ -93,7 +96,7 @@ func (*uploadService) Upload(file multipart.File, fileHeader *multipart.FileHead
 	return upload, nil
 }
 
-//InitialMultipart 初始化分片上传元信息
+// InitialMultipart 初始化分片上传元信息
 func (*uploadService) InitialMultipart(fileSize uint, fileName, fileType string) (string, int, error) {
 	fileExt := fileName[strings.LastIndex(fileName, ".")+1:] // 通过文件名获取文件后缀
 	newfileName := util.RandomStr(32) + "." + fileExt
@@ -117,4 +120,49 @@ func (*uploadService) InitialMultipart(fileSize uint, fileName, fileType string)
 	cache.UploadCache.InitiateMultipart(model, imur, chunkNum)
 
 	return imur.UploadID, chunkNum, nil
+}
+
+// UploadPart 上传分块文件
+func (*uploadService) UploadPart(part *form.UploadPart) error {
+	imur := cache.UploadCache.GetImur(part.UploadId)
+	content := make([]byte, part.FileSize)
+	_, err := part.File.Read(content)
+	if err != nil {
+		global.Logger.Error("分片上传文件内容读取失败", zap.Error(err))
+		return errors.New("上传失败")
+	}
+
+	res, err := global.Upload.Bucket.UploadPart(*imur, bytes.NewReader(content), part.FileSize, part.Num)
+	if err != nil {
+		global.Logger.Error("分片上传传送失败", zap.Error(err))
+		return errors.New("上传失败")
+	}
+
+	cache.UploadCache.SetUploadParts(part.UploadId, res)
+	return nil
+}
+
+// Complete 上传完成合并
+func (*uploadService) Complete(uploadId string, userId uint) error {
+	parts := cache.UploadCache.GetUploadParts(uploadId)
+	imur := cache.UploadCache.GetImur(uploadId)
+
+	// 通知上传合并
+	res, err := global.Upload.Bucket.CompleteMultipartUpload(*imur, parts)
+	if err != nil {
+		global.Logger.Error("文件上传合并失败", zap.Error(err))
+		return errors.New("文件保存失败")
+	}
+
+	// 将数据信息同步到mysql
+	upload := cache.UploadCache.GetUpload(uploadId)
+	if upload != nil {
+		upload.UserId = userId
+		upload.SavePath = res.Location
+		if err := repositories.UploadRepositories.Create(global.DB, upload); err != nil {
+			global.Logger.Error("文件上传合并保存到数据库失败", zap.Any("upload", upload), zap.Error(err))
+			return errors.New("文件保存失败")
+		}
+	}
+	return nil
 }

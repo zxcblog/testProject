@@ -1,17 +1,15 @@
 package comm
 
 import (
-	"bytes"
-	"fmt"
 	"github.com/kataras/iris/v12"
-	"new-project/cache"
 	"new-project/controller/render"
 	"new-project/global"
+	"new-project/models"
+	"new-project/models/form"
 	"new-project/pkg/app"
 	"new-project/pkg/config"
 	"new-project/pkg/errcode"
 	"new-project/services"
-	"time"
 )
 
 type UploadController struct {
@@ -21,6 +19,7 @@ type UploadController struct {
 // Post 单个文件上传
 // @Summary      单个文件上传
 // @Description  单个文件上传
+// @Security ApiKeyAuth
 // @Accept       mpfd
 // @Produce      json
 // @param        file  formData  file  true  "文件"
@@ -53,9 +52,10 @@ type InitiateMultipart struct {
 // @Description  大文件分块上传元信息
 // @Accept       json
 // @Produce      json
+// @Security ApiKeyAuth
 // @param        root  body  InitiateMultipart  true  "文件上传元信息"
 // @Tags         文件上传
-// @Success      200  {object}  app.Response
+// @Success      200  {object}  app.Response{data=app.Result{uploadId=string,chunkNum=int,chunkSize=int}} "uploadId上传分块文件标识 chunkNum文件上传数量 chunkSize每块文件切割大小"
 // @Router       /comm/upload/initiate/multipart [post]
 func (this *UploadController) PostInitiateMultipart() *app.Response {
 	param := &InitiateMultipart{}
@@ -81,6 +81,7 @@ func (this *UploadController) PostInitiateMultipart() *app.Response {
 // @Description  上传文件分块信息
 // @Accept       mpfd
 // @Produce      json
+// @Security ApiKeyAuth
 // @param        uploadId  path      string  true  "文件uploadId"
 // @param        num       path      int     true  "上传片"
 // @param        file      formData  file    true  "文件"
@@ -88,33 +89,22 @@ func (this *UploadController) PostInitiateMultipart() *app.Response {
 // @Success      200  {object}  app.Response{data=render.Upload}
 // @Router       /comm/upload/part/{U} [post]
 func (this *UploadController) PostPartBy(uploadId string, num int) *app.Response {
-	startTime := time.Now().UnixMilli()
 	file, fileHeader, err := this.Ctx.FormFile("file")
 	if err != nil {
 		return app.ToResponseErr(errcode.UploadFileError.SetMsg(err.Error()))
 	}
 	defer file.Close()
-	fmt.Println("文件获取时间:", time.Now().UnixMilli()-startTime)
-	fmt.Println(fileHeader.Size)
 
-	startTime = time.Now().UnixMilli()
-	imur := cache.UploadCache.GetImur(uploadId)
-	fmt.Println("缓存获取时间:", time.Now().UnixMilli()-startTime)
-
-	startTime = time.Now().UnixMilli()
-	content := make([]byte, fileHeader.Size)
-	_, err = file.Read(content)
-	fmt.Println("文件读取错误：", err)
-
-	res, err := global.Upload.Bucket.UploadPart(*imur, bytes.NewReader(content), fileHeader.Size, num)
-	fmt.Println("分片上传时间:", time.Now().UnixMilli()-startTime)
-	fmt.Println(res, err)
-	if err != nil {
+	req := &form.UploadPart{
+		FileSize: fileHeader.Size,
+		Num:      num,
+		UploadId: uploadId,
+		File:     file,
+	}
+	if err := services.UploadService.UploadPart(req); err != nil {
 		return app.ToResponseErr(err)
 	}
-
-	cache.UploadCache.SetUploadParts(uploadId, res)
-	return app.ResponseData(res)
+	return app.ResponseMsg("上传成功")
 }
 
 // PostCompleteBy 通知上传完成合并操作
@@ -122,63 +112,17 @@ func (this *UploadController) PostPartBy(uploadId string, num int) *app.Response
 // @Description  通知上传完成合并操作
 // @Accept       mpfd
 // @Produce      json
+// @Security ApiKeyAuth
 // @param        uploadId  path  string  true  "文件uploadId"
 // @Tags         文件上传
 // @Success      200  {object}  app.Response{data=render.Upload}
 // @Router       /comm/upload/complete/{uploadId} [post]
-func (this *UploadController) GetCompleteBy(uploadId string) *app.Response {
-	parts := cache.UploadCache.GetUploadParts(uploadId)
-	imur := cache.UploadCache.GetImur(uploadId)
-
-	res, err := global.Upload.Bucket.CompleteMultipartUpload(*imur, parts)
-	if err != nil {
+func (this *UploadController) PostCompleteBy(uploadId string) *app.Response {
+	// TODO 登录用户id
+	user := &models.User{}
+	user.ID = 6
+	if err := services.UploadService.Complete(uploadId, user.ID); err != nil {
 		return app.ToResponseErr(err)
 	}
-	return app.ResponseData(res)
+	return app.ResponseMsg("上传成功")
 }
-
-//func (this *UploadController) GetBy(id uint) {
-//upload := services.UploadService.Get(id)
-//if upload == nil {
-//	fmt.Println("找不到")
-//	return
-//}
-//
-//file, err := ioutil.ReadFile(upload.SavePath)
-//if err != nil {
-//	fmt.Println("文件打开失败")
-//	return
-//}
-//
-//if upload.FileType == "image" {
-//	this.Ctx.ContentType("image/*")
-//} else {
-//	this.Ctx.ContentType("video/*")
-//}
-//this.Ctx.Header("Transfer-Encoding", "chunked")
-//
-//err = this.Ctx.StreamWriter(func(w io.Writer) error {
-//	var i uint = 0
-//	for i < upload.FileSize {
-//		endi := i + 10000
-//		if endi >= upload.FileSize {
-//			endi = upload.FileSize
-//		}
-//		time.Sleep(1 * time.Second)
-//		_, err := w.Write(file[i:endi])
-//		if err != nil {
-//			return err
-//		}
-//		fmt.Println(i, endi, upload.FileSize)
-//		i = endi
-//		if i >= upload.FileSize {
-//			return io.EOF
-//		}
-//	}
-//	return nil
-//})
-//if err != nil {
-//	fmt.Println("流文件传输失败", err)
-//	return
-//}
-//}
