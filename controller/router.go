@@ -6,8 +6,8 @@ import (
 	"new-project/controller/admin"
 	"new-project/controller/api"
 	"new-project/controller/comm"
-	"new-project/controller/middleware"
 	_ "new-project/docs"
+	middleware2 "new-project/middleware"
 	"new-project/pkg/config"
 
 	"github.com/iris-contrib/swagger/v12"
@@ -41,12 +41,15 @@ func Router() {
 	}
 
 	mvc.Configure(app.Party("/api"), func(m *mvc.Application) {
-		m.Router.Use(middleware.AccessLog) // 访问日志中间件
+		m.Router.Use(middleware2.AccessLog) // 访问日志中间件
 		//m.Router.Use(middleware.Limiter)   // 限流
 		// 前台管理
-		m.Party("/system").Handle(new(api.SystemController))
+		m.Party("/system").Handle(new(api.SystemController))   // 测试访问接口
 		m.Party("/user").Handle(new(api.UserController))       //用户
 		m.Party("/captcha").Handle(new(api.CaptchaController)) //验证码
+
+		m.Router.Use(middleware2.Token)
+		m.Party("/address").Handle(new(api.AddressController)) // 用户地址
 
 		// 后台管理
 		adminRoute := m.Party("/admin")

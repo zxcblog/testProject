@@ -28,7 +28,6 @@ func (b *brandRepositories) GetList(db *gorm.DB, page, pageSize int) ([]*models.
 	list := make([]*models.Brand, 0, pageSize)
 	var total int64
 	db.Model(models.Brand{}).Count(&total).
-		Order("sort desc").
 		Limit(pageSize).Offset((page - 1) * pageSize).Find(&list)
 	return list, total
 }

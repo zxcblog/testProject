@@ -1,4 +1,5 @@
 Service:
+  AppName: test-project
   DebugMode: true
   MaxPageSize: 100
   MinPageSize: 1

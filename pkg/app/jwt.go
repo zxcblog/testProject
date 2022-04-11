@@ -2,7 +2,7 @@ package app
 
 import (
 	"errors"
-	"new-project/models"
+	"new-project/pkg/config"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
@@ -21,14 +21,14 @@ type MyClaims struct {
 var MySecret = []byte("j6cFIiBsY9jSIxXg")
 
 // GenToken 生成JWT
-func GenToken(user *models.User, tokenExpireDuration time.Time) (string, error) {
+func GenToken(username string, tokenExpireDuration time.Time) (string, error) {
 	// 创建一个我们自己的声明
 	c := MyClaims{
-		user.Username, // 自定义字段
+		username, // 自定义字段
 		jwt.StandardClaims{
-			ExpiresAt: tokenExpireDuration.Unix(), // 过期时间
-			IssuedAt:  time.Now().Unix(),          //发放时间
-			Issuer:    "test-project",             // 签发人
+			ExpiresAt: tokenExpireDuration.Unix(),  // 过期时间
+			IssuedAt:  time.Now().Unix(),           //发放时间
+			Issuer:    config.GetService().AppName, // 签发人
 		},
 	}
 	// 使用指定的签名方法(hash)创建签名对象

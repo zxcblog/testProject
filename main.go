@@ -5,10 +5,10 @@ import (
 	"new-project/controller"
 	"new-project/global"
 	"new-project/models"
-	"new-project/pkg/app"
 	"new-project/pkg/config"
 	"new-project/pkg/logger"
 	"new-project/pkg/upload"
+	"new-project/pkg/validate"
 )
 
 // @title           测试商城项目
@@ -41,7 +41,7 @@ func main() {
 	}
 
 	// 加载参数验证器
-	global.Validate = app.NewTranslationIns(app.WithLabelOption("label"), app.WithRulesOption(&app.Rules), app.WithRulesMsgOption(&app.RulesMsg))
+	global.Validate = validate.NewTranslationIns(validate.WithLabelOption("label"), validate.WithRulesOption(&validate.Rules), validate.WithRulesMsgOption(&validate.RulesMsg))
 
 	// 加载oss存储
 	if global.Upload, err = upload.NewClient(config.GetOss()); err != nil {

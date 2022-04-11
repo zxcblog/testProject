@@ -2,6 +2,7 @@ package cache
 
 import (
 	"context"
+	"fmt"
 	"new-project/global"
 	"new-project/models"
 	"new-project/pkg/util"
@@ -10,7 +11,7 @@ import (
 	"go.uber.org/zap"
 )
 
-var UserCache = NewUserCache(context.Background(), "user:login:")
+var UserCache = NewUserCache(context.Background(), "user:")
 
 type userCache struct {
 	ctx context.Context
@@ -34,4 +35,23 @@ func (this *userCache) SetUserLoginData(token string, user *models.User) (bool, 
 	}
 
 	return res != "", nil
+}
+
+func (this *userCache) Set(user *models.User) {
+	res, err := global.Redis.Set(this.ctx, this.key+user.Username, util.StructToString(user), 2*time.Hour+30*time.Second).Result()
+	fmt.Println(res)
+	if err != nil {
+		global.Logger.Error("[cache] 用户信息存储失败")
+	}
+}
+
+func (this *userCache) Get(username string) (user *models.User) {
+	res, err := global.Redis.Get(this.ctx, this.key+username).Result()
+	if err != nil {
+		global.Logger.Error("[cache] 用户信息读取失败")
+		return nil
+	}
+
+	util.StringToStruct(res, &user)
+	return user
 }

@@ -4,7 +4,7 @@
 // @File:          validate_rule
 // @Data:          2022/2/2711:34
 //
-package app
+package validate
 
 import (
 	ut "github.com/go-playground/universal-translator"

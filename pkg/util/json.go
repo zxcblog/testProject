@@ -17,5 +17,5 @@ func StructToString(val interface{}) string {
 }
 
 func StringToStruct(str string, val interface{}) {
-	json.Unmarshal([]byte(str), val)
+	_ = json.Unmarshal([]byte(str), val)
 }

@@ -12,10 +12,11 @@ type Service struct {
 	MaxPageSize          int      `yaml:"MaxPageSize"`
 	MinPageSize          int      `yaml:"MinPageSize"`
 	UploadChunkSize      int      `yaml:"UploadChunkSize"`
-	Host                 string   `yaml:"Host"`
-	UploadSavePath       string   `yaml:"UploadSavePath"`
 	UploadImgMaxSize     float64  `yaml:"UploadMaxImgSize"`
 	UploadVideoMaxSize   float64  `yaml:"UploadVideoMaxSize"`
+	Host                 string   `yaml:"Host"`
+	AppName              string   `yaml:"AppName"`
+	UploadSavePath       string   `yaml:"UploadSavePath"`
 	UploadImageAllowExts []string `yaml:"UploadImageAllowExts"`
 	UploadVideoAllowExts []string `yaml:"UploadVideoAllowExts"`
 }

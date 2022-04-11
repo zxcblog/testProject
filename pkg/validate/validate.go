@@ -4,7 +4,7 @@
 // @File:          validate
 // @Data:          2022/2/2711:27
 //
-package app
+package validate
 
 import (
 	"errors"
