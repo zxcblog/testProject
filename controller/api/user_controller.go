@@ -72,7 +72,7 @@ func (this *UserController) PostRegister() *app.Response {
 func (this *UserController) PostLogin() *app.Response {
 	params := &form.UserLogin{}
 	if err := app.FormValueJson(this.Ctx, global.Validate, params); err != nil {
-		return app.ResponseErrMsg(err.Error())
+		return err
 	}
 
 	if err := services.CaptchaService.VerifyCaptcha(params.CaptchaId, params.UserCapt); err != nil {

@@ -9,8 +9,10 @@ package middleware
 import (
 	"fmt"
 	"github.com/kataras/iris/v12"
+	"new-project/cache"
 	"new-project/pkg/app"
 	"strings"
+	"time"
 )
 
 func Token(ctx iris.Context) {
@@ -21,16 +23,26 @@ func Token(ctx iris.Context) {
 
 	// 没有上传token时， 让用户登录
 	if strings.TrimSpace(token) == "" {
-		ctx.JSON(app.UnauthorizedAuthNotExist)
-		ctx.StopExecution()
+		ctx.StopWithJSON(401, app.UnauthorizedAuthNotExist)
 	}
 
 	// 验证token是否正确
 	myClaims, err := app.ParseToken(token)
 	if err != nil {
 		fmt.Println(err)
+		ctx.StopWithJSON(401, app.UnauthorizedTokenError)
 	}
-	fmt.Println(myClaims)
 
+	if time.Now().Unix() > myClaims.ExpiresAt {
+		ctx.StopWithJSON(401, app.UnauthorizedTokenTimeout)
+	}
+
+	// 获取正在登录中的用户
+	user := cache.UserCache.Get(myClaims.Username)
+	if user == nil {
+		ctx.StopWithJSON(401, app.UnauthorizedAuthNotExist)
+	}
+
+	ctx.Values().Set("user", user)
 	ctx.Next()
 }

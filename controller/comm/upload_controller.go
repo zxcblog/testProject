@@ -18,7 +18,7 @@ type UploadController struct {
 // Post 单个文件上传
 // @Summary      单个文件上传
 // @Description  单个文件上传
-// @Security ApiKeyAuth
+// @Security     ApiKeyAuth
 // @Accept       mpfd
 // @Produce      json
 // @param        file  formData  file  true  "文件"
@@ -51,10 +51,10 @@ type InitiateMultipart struct {
 // @Description  大文件分块上传元信息
 // @Accept       json
 // @Produce      json
-// @Security ApiKeyAuth
+// @Security     ApiKeyAuth
 // @param        root  body  InitiateMultipart  true  "文件上传元信息"
 // @Tags         文件上传
-// @Success      200  {object}  app.Response{data=app.Result{uploadId=string,chunkNum=int,chunkSize=int}} "uploadId上传分块文件标识 chunkNum文件上传数量 chunkSize每块文件切割大小"
+// @Success      200  {object}  app.Response{data=app.Result{uploadId=string,chunkNum=int,chunkSize=int}}  "uploadId上传分块文件标识 chunkNum文件上传数量 chunkSize每块文件切割大小"
 // @Router       /comm/upload/initiate/multipart [post]
 func (this *UploadController) PostInitiateMultipart() *app.Response {
 	param := &InitiateMultipart{}
@@ -80,7 +80,7 @@ func (this *UploadController) PostInitiateMultipart() *app.Response {
 // @Description  上传文件分块信息
 // @Accept       mpfd
 // @Produce      json
-// @Security ApiKeyAuth
+// @Security     ApiKeyAuth
 // @param        uploadId  path      string  true  "文件uploadId"
 // @param        num       path      int     true  "上传片"
 // @param        file      formData  file    true  "文件"
@@ -111,7 +111,7 @@ func (this *UploadController) PostPartBy(uploadId string, num int) *app.Response
 // @Description  通知上传完成合并操作
 // @Accept       mpfd
 // @Produce      json
-// @Security ApiKeyAuth
+// @Security     ApiKeyAuth
 // @param        uploadId  path  string  true  "文件uploadId"
 // @Tags         文件上传
 // @Success      200  {object}  app.Response{data=render.Upload}

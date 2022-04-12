@@ -7,7 +7,7 @@ import (
 	"new-project/controller/api"
 	"new-project/controller/comm"
 	_ "new-project/docs"
-	middleware2 "new-project/middleware"
+	"new-project/middleware"
 	"new-project/pkg/config"
 
 	"github.com/iris-contrib/swagger/v12"
@@ -41,14 +41,14 @@ func Router() {
 	}
 
 	mvc.Configure(app.Party("/api"), func(m *mvc.Application) {
-		m.Router.Use(middleware2.AccessLog) // 访问日志中间件
+		m.Router.Use(middleware.AccessLog) // 访问日志中间件
 		//m.Router.Use(middleware.Limiter)   // 限流
 		// 前台管理
 		m.Party("/system").Handle(new(api.SystemController))   // 测试访问接口
 		m.Party("/user").Handle(new(api.UserController))       //用户
 		m.Party("/captcha").Handle(new(api.CaptchaController)) //验证码
 
-		m.Router.Use(middleware2.Token)
+		m.Router.Use(middleware.Token)
 		m.Party("/address").Handle(new(api.AddressController)) // 用户地址
 
 		// 后台管理
@@ -67,6 +67,7 @@ func Router() {
 	// 当对应的options请求在路由中没有监听时， 会将路由请求返回并跳转路由
 	// 为了防止这种情况， 使用默认路径来进行缓冲，让iris框架获取请求中的实际请求协议
 	app.Any("{root:path}", func(ctx iris.Context) {
+
 		// TODO 记录访问不存在的路径以及请求的用户信息
 		ctx.StatusCode(404)
 	})

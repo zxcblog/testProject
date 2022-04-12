@@ -25,7 +25,7 @@ type BrandController struct {
 // @Description  后台管理人员添加商品品牌
 // @Accept       json
 // @Produce      json
-//@Security ApiKeyAuth
+//@Security      ApiKeyAuth
 // @param        root  body  form.Brand  true  "添加商品品牌"
 // @Tags         品牌
 // @Success      200  {object}  app.Response{data=render.Brand}
@@ -52,7 +52,7 @@ func (b *BrandController) Post() *app.Response {
 // @Summary      获取品牌列表
 // @Description  获取品牌列表
 // @Produce      json
-//@Security ApiKeyAuth
+//@Security      ApiKeyAuth
 // @param        categoryID  query  uint  false  "分类id"  default(0)
 // @param        page        query  uint  false  "分页"    default(1)
 // @param        pageSize    query  uint  false  "分页页数"  default(10)
@@ -72,7 +72,7 @@ func (b *BrandController) Get() *app.Response {
 // @Summary      获取品牌详情
 // @Description  通过品牌id获取品牌详情
 // @Produce      json
-//@Security ApiKeyAuth
+//@Security      ApiKeyAuth
 // @param        brandID  path  uint  true  "品牌id"
 // @tags         品牌
 // @Success      200  {object}  app.Response{data=render.Brand}
@@ -86,8 +86,8 @@ func (b *BrandController) GetBy(id uint) *app.Response {
 // @Description  修改品牌信息
 // @Accept       json
 // @Produce      json
-//@Security ApiKeyAuth
-// @param        brandID  path  uint          true  "品牌ID"
+//@Security      ApiKeyAuth
+// @param        brandID  path  uint        true  "品牌ID"
 // @param        root     body  form.Brand  true  "修改品牌信息"
 // @Tags         品牌
 // @Success      200  {object}  app.Response{data=render.Brand}
@@ -118,7 +118,7 @@ func (b *BrandController) PutBy(id uint) *app.Response {
 // @Summary      删除品牌信息
 // @Description  删除品牌信息
 // @Produce      json
-//@Security ApiKeyAuth
+//@Security      ApiKeyAuth
 // @param        brandID  path  uint  true  "品牌ID"
 // @Tags         品牌
 // @Success      200  {object}  app.Response

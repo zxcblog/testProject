@@ -58,5 +58,7 @@ func (u *userService) Login(username, password string) (*models.User, error) {
 	if util.Md5Encrypt(password+user.Salt) != user.Password {
 		return nil, errors.New("用户名或密码错误")
 	}
+
+	cache.UserCache.Set(user)
 	return user, nil
 }

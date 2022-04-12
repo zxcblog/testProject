@@ -25,7 +25,7 @@ type CategoryController struct {
 // @Description  后台管理人员添加商品分类
 // @Accept       json
 // @Produce      json
-//@Security ApiKeyAuth
+//@Security      ApiKeyAuth
 // @param        root  body  form.Category  true  "添加商品分类"
 // @Tags         商品分类
 // @Success      200  {object}  app.Response{data=render.Category}
@@ -85,7 +85,7 @@ func (this *CategoryController) GetBy(id uint) *app.Response {
 // @Description  修改分类信息
 // @Accept       json
 // @Produce      json
-// @param        categoryID  path  uint             true  "分类ID"
+// @param        categoryID  path  uint           true  "分类ID"
 // @param        root        body  form.Category  true  "修改商品分类"
 // @Tags         商品分类
 // @Success      200  {object}  app.Response{data=render.Category}

@@ -24,8 +24,8 @@ func NewCaptchaService() *captchaService {
 func (this *captchaService) GetCaptchaID() string {
 	// 获取随机字符串值
 	randID := time.Now().Format("150405") + util.RandomStr(14)
-
 	cache.CaptchCache.Set(randID, captcha.RandomDigits(4))
+
 	return randID
 }
 

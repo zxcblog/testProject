@@ -28,8 +28,8 @@ func (this *CaptchaController) Get() *app.Response {
 // GetBy 通过验证码ID获取到图片
 // @Summary      通过验证码ID获取到图片
 // @Description  通过验证码ID获取到图片
-// @param        captchaId  path  string  true  "验证码id"
-// @param        refresh  query  bool  false  "是否刷新验证码"
+// @param        captchaId  path   string  true   "验证码id"
+// @param        refresh    query  bool    false  "是否刷新验证码"
 // @Produce      json
 // @Tags         验证码
 // @Success      200

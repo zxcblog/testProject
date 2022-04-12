@@ -21,7 +21,7 @@ type AddressController struct {
 // @Description  新增地址
 // @Accept       json
 // @Produce      json
-// @Security ApiKeyAuth
+// @Security     ApiKeyAuth
 // @Tags         用户地址
 // @Success      200  {object}  app.Response{}
 // @Router       /address [post]
