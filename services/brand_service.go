@@ -7,10 +7,10 @@
 package services
 
 import (
+	"errors"
 	"go.uber.org/zap"
 	"new-project/global"
 	"new-project/models"
-	"new-project/pkg/errcode"
 	"new-project/repositories"
 )
 
@@ -46,7 +46,7 @@ func (b *brandService) Create(brand *models.Brand) error {
 	err := repositories.BrandRepositories.Create(global.DB, brand)
 	if err != nil {
 		global.Logger.Error("品牌创建失败", zap.Error(err))
-		return errcode.CreateError.SetMsg("品牌创建失败")
+		return errors.New("品牌创建失败")
 	}
 	return nil
 }
@@ -60,7 +60,7 @@ func (b *brandService) Update(brand *models.Brand) error {
 	err := repositories.BrandRepositories.Update(global.DB, brand)
 	if err != nil {
 		global.Logger.Error("品牌修改失败", zap.Error(err))
-		return errcode.CreateError.SetMsg("品牌修改失败")
+		return errors.New("品牌修改失败")
 	}
 	return nil
 }
@@ -68,10 +68,10 @@ func (b *brandService) Update(brand *models.Brand) error {
 func (b *brandService) setCategory(categoryID uint) error {
 	category := CategoryService.Get(categoryID)
 	if category == nil {
-		return errcode.NotFound
+		return errors.New("所属分类不存在")
 	}
 	if !category.IsFinal {
-		return errcode.RequestError.SetMsg("所选分类不是最终类")
+		return errors.New("所选分类不是最终类")
 	}
 	return nil
 }
@@ -81,7 +81,7 @@ func (b *brandService) Delete(id uint) error {
 	err := repositories.BrandRepositories.Delete(global.DB, id)
 	if err != nil {
 		global.Logger.Error("品牌删除失败", zap.Error(err))
-		return errcode.DelError
+		return errors.New("品牌删除失败")
 	}
 	return nil
 }

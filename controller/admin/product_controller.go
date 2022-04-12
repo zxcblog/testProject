@@ -3,10 +3,7 @@ package admin
 import (
 	"new-project/controller/render"
 	"new-project/global"
-	"new-project/models"
 	"new-project/pkg/app"
-	"new-project/pkg/errcode"
-	"new-project/pkg/util"
 	"new-project/services"
 
 	"github.com/kataras/iris/v12"
@@ -47,63 +44,62 @@ type PostProductAddCheckedParams struct {
 // @Router       /admin/product [post]
 func (this *ProductController) Post() *app.Response {
 	params := &PostProductAddCheckedParams{}
-
 	if err := app.FormValueJson(this.Ctx, global.Validate, params); err != nil {
-		return app.ToResponseErr(err)
+		return err
 	}
 
-	//TODO 增加事务
-
-	//商品model赋值
-	product := &models.Product{
-		ProductName:   params.ProductName,
-		ProductTitle:  params.ProductTitle,
-		CategoryID:    params.CategoryID,
-		BrandId:       params.BrandId,
-		CategoryImgId: params.CategoryImgId,
-		PicImgIds:     util.StructToString(params.PicImgIds),
-		Introduction:  params.Introduction,
-	}
-
-	//添加商品主信息
-	err := services.ProductService.Create(product)
-
-	if err != nil {
-		return app.ToResponseErr(err)
-	}
-
-	//插入sku key与value
-	SkuKeyValueSliceData := make([]*models.ProductSkuKeyValue, 0)
-	for _, val := range params.SkuAttributeKeyValueData {
-
-		SkuKeyValueSliceData = append(SkuKeyValueSliceData, &models.ProductSkuKeyValue{
-			ProductId:      product.ID,
-			BrandId:        params.BrandId,
-			AttributeKey:   val.AttributeKey,
-			AttributeValue: util.StructToString(val.AttributeValue),
-		})
-	}
-	//批量添加规格key和value
-	err = services.ProductSkuKeyValueService.BatchCreate(SkuKeyValueSliceData)
-	if err != nil {
-		return app.ToResponseErr(err)
-	}
-
-	SkuSliceData := make([]*models.ProductSku, 0)
-	//插入组装好的规格数据
-	for _, SkuDataVal := range params.SkuData {
-
-		SkuSliceData = append(SkuSliceData, &models.ProductSku{
-			ProductId:    product.ID,
-			SkuAttribute: util.StructToString(SkuDataVal.SkuAttribute),
-			Stock:        SkuDataVal.Stock,
-			Price:        SkuDataVal.Price,
-		})
-	}
-	err = services.ProductSkuService.BatchCreate(SkuSliceData)
-	if err != nil {
-		return app.ToResponseErr(err)
-	}
+	////TODO 增加事务
+	//
+	////商品model赋值
+	//product := &models.Product{
+	//	ProductName:   params.ProductName,
+	//	ProductTitle:  params.ProductTitle,
+	//	CategoryID:    params.CategoryID,
+	//	BrandId:       params.BrandId,
+	//	CategoryImgId: params.CategoryImgId,
+	//	PicImgIds:     util.StructToString(params.PicImgIds),
+	//	Introduction:  params.Introduction,
+	//}
+	//
+	////添加商品主信息
+	//err := services.ProductService.Create(product)
+	//
+	//if err != nil {
+	//	return app.ToResponseErr(err)
+	//}
+	//
+	////插入sku key与value
+	//SkuKeyValueSliceData := make([]*models.ProductSkuKeyValue, 0)
+	//for _, val := range params.SkuAttributeKeyValueData {
+	//
+	//	SkuKeyValueSliceData = append(SkuKeyValueSliceData, &models.ProductSkuKeyValue{
+	//		ProductId:      product.ID,
+	//		BrandId:        params.BrandId,
+	//		AttributeKey:   val.AttributeKey,
+	//		AttributeValue: util.StructToString(val.AttributeValue),
+	//	})
+	//}
+	////批量添加规格key和value
+	//err = services.ProductSkuKeyValueService.BatchCreate(SkuKeyValueSliceData)
+	//if err != nil {
+	//	return app.ToResponseErr(err)
+	//}
+	//
+	//SkuSliceData := make([]*models.ProductSku, 0)
+	////插入组装好的规格数据
+	//for _, SkuDataVal := range params.SkuData {
+	//
+	//	SkuSliceData = append(SkuSliceData, &models.ProductSku{
+	//		ProductId:    product.ID,
+	//		SkuAttribute: util.StructToString(SkuDataVal.SkuAttribute),
+	//		Stock:        SkuDataVal.Stock,
+	//		Price:        SkuDataVal.Price,
+	//	})
+	//}
+	//err = services.ProductSkuService.BatchCreate(SkuSliceData)
+	//if err != nil {
+	//	return app.ToResponseErr(err)
+	//}
 
 	return app.ResponseMsg("添加成功")
 }
@@ -117,11 +113,9 @@ func (this *ProductController) Post() *app.Response {
 // @Success      200  {object}  app.Response{data=app.Result}
 // @Router       /admin/product/{productId} [get]
 func (this *ProductController) GetBy(id uint) *app.Response {
-	//商品详情
 	productRes := services.ProductService.Get(id)
-
 	if productRes == nil {
-		return app.ToResponseErr(errcode.NotFound)
+		return app.NotFound
 	}
 
 	//sku数据
@@ -161,6 +155,5 @@ func (this *ProductController) Get() *app.Response {
 	pageSize := app.GetPageSize(this.Ctx)
 
 	list, total := services.ProductService.GetListPage(whereParams, page, pageSize)
-
 	return app.ToResponseList(render.BuildProductList(list), total)
 }

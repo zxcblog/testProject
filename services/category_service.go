@@ -7,12 +7,12 @@
 package services
 
 import (
+	"errors"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 	"new-project/cache"
 	"new-project/global"
 	"new-project/models"
-	"new-project/pkg/errcode"
 	"new-project/repositories"
 	"strconv"
 )
@@ -44,7 +44,7 @@ func (c *categoryService) Create(category *models.Category) error {
 	err := repositories.CategoryRepositories.Create(global.DB, category)
 	if err != nil {
 		global.Logger.Error("分类创建失败", zap.Error(err))
-		return errcode.CreateError.SetMsg("分类创建失败")
+		return errors.New("分类创建失败")
 	}
 
 	_, err = cache.CategoryCache.SetCategory(category)
@@ -63,7 +63,7 @@ func (c *categoryService) Update(category *models.Category) error {
 	err := repositories.CategoryRepositories.Update(global.DB, category)
 	if err != nil {
 		global.Logger.Error("分类修改失败", zap.Error(err))
-		return errcode.CreateError.SetMsg("分类修改失败")
+		return errors.New("分类修改失败")
 	}
 
 	_, err = cache.CategoryCache.SetCategory(category)
@@ -81,10 +81,10 @@ func (c *categoryService) setCategoryParent(category *models.Category) error {
 
 	parentCategory := repositories.CategoryRepositories.Get(global.DB, category.CategoryID)
 	if parentCategory == nil {
-		return errcode.SelectError.SetMsg("所属分类不存在")
+		return errors.New("所属分类不存在")
 	}
 	if parentCategory.IsFinal {
-		return errcode.RequestError.SetMsg("当前分类为最终类，不能添加子类目")
+		return errors.New("当前分类为最终类，不能添加子类目")
 	}
 	if parentCategory.Level >= 2 {
 		category.IsFinal = true
@@ -98,7 +98,7 @@ func (c *categoryService) setCategoryParent(category *models.Category) error {
 func (c *categoryService) Delete(id uint) error {
 	category := c.Get(id)
 	if category == nil {
-		return errcode.SelectError
+		return nil
 	}
 
 	// 要被删除的子集
@@ -115,22 +115,23 @@ func (c *categoryService) Delete(id uint) error {
 	})
 	if err != nil {
 		global.Logger.Error("分类删除失败", zap.Error(err))
-		return errcode.TransactionError.SetMsg("分类删除失败")
+		return errors.New("分类删除失败")
 	}
 
-	//删除分类时， 一同删除其他分类
+	//删除分类时， 删除缓存信息
 	cache.CategoryCache.DelCategory(path)
 	return nil
 }
 
 // QueryName 通过名称搜索分类
-func (c *categoryService) QueryName(categoryName string) ([]*models.Category, error) {
+func (c *categoryService) QueryName(categoryName string) (list []*models.Category) {
 	db := global.DB.Where("category_name like ?", "%"+categoryName+"%").Where("is_final", true)
-	categories, err := repositories.CategoryRepositories.GetWhereList(db)
+
+	var err error
+	list, err = repositories.CategoryRepositories.GetWhereList(db)
 	if err != nil {
 		global.Logger.Error("分类名称模糊查询失败", zap.Error(err))
-		return []*models.Category{}, errcode.SelectError
 	}
 
-	return categories, nil
+	return list
 }

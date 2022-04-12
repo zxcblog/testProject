@@ -11,8 +11,8 @@ import (
 	"new-project/controller/render"
 	"new-project/global"
 	"new-project/models"
+	"new-project/models/form"
 	"new-project/pkg/app"
-	"new-project/pkg/errcode"
 	"new-project/services"
 )
 
@@ -20,27 +20,20 @@ type CategoryController struct {
 	Ctx iris.Context
 }
 
-// CategoryRequest 创建分类
-type CategoryRequest struct {
-	CategoryName string `validate:"required,min=1,max=20" label:"分类名称" json:"categoryName"` // 分类名称
-	CategoryImg  string `validate:"-" label:"分类图片" json:"categoryImg" default:""`           // 分类图片地址链接
-	CategoryID   uint   `validate:"-" label:"所属分类" json:"categoryID" default:"0"`           // 所属分类
-	Sort         uint   `validate:"min=0,max=100" label:"排序" json:"sort" default:"0"`       //排序
-}
-
 // Post 添加商品分类
 // @Summary      添加商品分类
 // @Description  后台管理人员添加商品分类
 // @Accept       json
 // @Produce      json
-// @param        root  body  CategoryRequest  true  "添加商品分类"
+//@Security ApiKeyAuth
+// @param        root  body  form.Category  true  "添加商品分类"
 // @Tags         商品分类
 // @Success      200  {object}  app.Response{data=render.Category}
 // @Router       /admin/category [post]
 func (this *CategoryController) Post() *app.Response {
-	param := &CategoryRequest{}
+	param := &form.Category{}
 	if err := app.FormValueJson(this.Ctx, global.Validate, param); err != nil {
-		return app.ToResponseErr(err)
+		return err
 	}
 
 	category := &models.Category{
@@ -51,7 +44,7 @@ func (this *CategoryController) Post() *app.Response {
 	}
 
 	if err := services.CategoryService.Create(category); err != nil {
-		return app.ToResponseErr(err)
+		return app.CreateError.SetMsg(err.Error())
 	}
 	return app.ResponseData(render.BuildCreategory(category))
 }
@@ -84,12 +77,7 @@ func (this *CategoryController) Get() *app.Response {
 // @Success      200  {object}  app.Response{data=render.Category}
 // @Router       /admin/category/{categoryID} [get]
 func (this *CategoryController) GetBy(id uint) *app.Response {
-	res := services.CategoryService.Get(id)
-
-	if res == nil {
-		return app.ToResponseErr(errcode.NotFound)
-	}
-	return app.ResponseData(render.BuildCreategory(res))
+	return app.ResponseData(render.BuildCreategory(services.CategoryService.Get(id)))
 }
 
 // PutBy 修改分类信息
@@ -98,32 +86,30 @@ func (this *CategoryController) GetBy(id uint) *app.Response {
 // @Accept       json
 // @Produce      json
 // @param        categoryID  path  uint             true  "分类ID"
-// @param        root        body  CategoryRequest  true  "修改商品分类"
+// @param        root        body  form.Category  true  "修改商品分类"
 // @Tags         商品分类
 // @Success      200  {object}  app.Response{data=render.Category}
 // @Router       /admin/category/{categoryID} [put]
 func (this *CategoryController) PutBy(id uint) *app.Response {
 	category := services.CategoryService.Get(id)
 	if category == nil {
-		return app.ToResponseErr(errcode.NotFound)
+		return app.NotFound
 	}
 
-	param := &CategoryRequest{}
+	param := &form.Category{}
 	if err := app.FormValueJson(this.Ctx, global.Validate, param); err != nil {
-		return app.ToResponseErr(err)
+		return err
+	}
+	if category.ID == param.CategoryID {
+		return app.ResponseErrMsg("自己不能为自己父级")
 	}
 
 	category.CategoryName = param.CategoryName
 	category.CategoryImg = param.CategoryImg
 	category.CategoryID = param.CategoryID
 	category.Sort = param.Sort
-
-	if category.ID == category.CategoryID {
-		return app.ResponseErrMsg("自己不能为自己父级")
-	}
-
 	if err := services.CategoryService.Update(category); err != nil {
-		return app.ToResponseErr(err)
+		return app.UploadFileError.SetMsg(err.Error())
 	}
 
 	return app.ResponseMsg("param")
@@ -139,33 +125,24 @@ func (this *CategoryController) PutBy(id uint) *app.Response {
 // @Router       /admin/category/{categoryID} [delete]
 func (this *CategoryController) DeleteBy(id uint) *app.Response {
 	if err := services.CategoryService.Delete(id); err != nil {
-		return app.ToResponseErr(err)
+		return app.DelError.SetMsg(err.Error())
 	}
-	return app.ResponseMsg("")
-}
-
-type CategoryQueryName struct {
-	CategoryName string `validate:"required,min=1,max=20" label:"分类名称" json:"categoryName"` // 分类名称
+	return app.ResponseMsg("删除分类成功")
 }
 
 // PostQueryName 通过分类名称查询
 // @Summary      分类名称搜索
 // @Description  通过分类名称搜索可绑定的分类信息
 // @Produce      json
-// @Param        root  body  CategoryQueryName  true  "分类名称"
+// @Param        root  body  form.CategoryQueryName  true  "分类名称"
 // @Tags         商品分类
 // @Success      200  {object}  app.Response{data=[]render.Category}
 // @Router       /admin/category/query/name [post]
 func (this *CategoryController) PostQueryName() *app.Response {
-	param := &CategoryQueryName{}
+	param := &form.CategoryQueryName{}
 	if err := app.FormValueJson(this.Ctx, global.Validate, param); err != nil {
-		return app.ToResponseErr(err)
+		return err
 	}
 
-	categories, err := services.CategoryService.QueryName(param.CategoryName)
-	if err != nil {
-		return app.ToResponseErr(err)
-	}
-
-	return app.ResponseData(render.BuildCreategoryPathName(categories))
+	return app.ResponseData(render.BuildCreategoryPathName(services.CategoryService.QueryName(param.CategoryName)))
 }

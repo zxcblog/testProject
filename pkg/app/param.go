@@ -10,7 +10,6 @@ import (
 	"errors"
 	"fmt"
 	"github.com/kataras/iris/v12"
-	"new-project/pkg/errcode"
 	"new-project/pkg/validate"
 	"strconv"
 )
@@ -74,13 +73,13 @@ func FormValueUInt64(ctx iris.Context, name string) (uint64, error) {
 	return strconv.ParseUint(str, 10, 0)
 }
 
-func FormValueJson(ctx iris.Context, validate *validate.Translations, data interface{}) error {
+func FormValueJson(ctx iris.Context, validate *validate.Translations, data interface{}) *Response {
 	if err := ctx.ReadJSON(data); err != nil {
-		return err
+		return InvalidParams.SetMsg(err.Error())
 	}
 	// 验证参数是否正确
 	if err := validate.ValidateParam(data); err != nil {
-		return errcode.InvalidParams.SetMsg(err.Error())
+		return InvalidParams.SetMsg(err.Error())
 	}
 	return nil
 }

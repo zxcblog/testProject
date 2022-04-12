@@ -9,7 +9,6 @@ package middleware
 import (
 	"github.com/kataras/iris/v12"
 	"new-project/pkg/app"
-	"new-project/pkg/errcode"
 	"new-project/pkg/limiter"
 	"time"
 )
@@ -26,7 +25,7 @@ func Limiter(ctx iris.Context) {
 
 	count := bucket.TakeAvailable(1)
 	if count == 0 {
-		ctx.JSON(app.ToResponseErr(errcode.TooManyRequests))
+		ctx.JSON(app.TooManyRequests)
 		ctx.StopExecution()
 		return
 	}

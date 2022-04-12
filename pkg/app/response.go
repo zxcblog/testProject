@@ -8,6 +8,16 @@ type Response struct {
 	Msg  string      `json:"msg"`
 }
 
+func (r *Response) Error() string {
+	return r.Msg
+}
+
+func (r *Response) SetMsg(msg string) *Response {
+	err := *r
+	err.Msg = msg
+	return &err
+}
+
 func ResponseMsg(msg string) *Response {
 	return ToResponse(msg, nil)
 }

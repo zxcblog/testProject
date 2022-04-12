@@ -5,11 +5,8 @@ import (
 	"new-project/cache"
 	"new-project/global"
 	"new-project/models"
-	"new-project/pkg/app"
-	"new-project/pkg/errcode"
 	"new-project/pkg/util"
 	"new-project/repositories"
-	"time"
 
 	"go.uber.org/zap"
 )
@@ -50,46 +47,16 @@ func (u *userService) Create(user *models.User) error {
 	return nil
 }
 
-type Token struct {
-	Token    string `json:"token"`
-	Expire   int64  `json:"expire"`
-	Duration int64  `json:"duration"`
-}
-
-// GenToken 生成token并缓存用户信息
-func (u *userService) GenTokenDefault2Hour(user *models.User) (*Token, error) {
-	//生成Token
-	tokenExpire := time.Now().Add(2 * time.Hour)
-	tokenString, err := app.GenToken(user, tokenExpire)
-	if err != nil {
-		global.Logger.Error("用户注册生成token失败", zap.Error(err))
-		return nil, errcode.UnauthorizedTokenGenerate
-	}
-
-	//将用户信息储存到redis
-	if _, err := cache.UserCache.SetUserLoginData(tokenString, user); err != nil {
-		global.Logger.Error("用户信息缓存token失败", zap.Error(err))
-		return nil, errcode.UnauthorizedTokenGenerate
-	}
-
-	return &Token{
-		Token:    tokenString,
-		Expire:   tokenExpire.Unix(),
-		Duration: 2 * time.Hour.Milliseconds() / 1000,
-	}, nil
-}
-
-//调用model 验证账号和密码 调用jwt
+//Login 用户账号密码登录
 func (u *userService) Login(username, password string) (*models.User, error) {
 	user := repositories.UserRepositories.GetUsernameData(global.DB, username)
 	if user == nil {
-		return nil, errcode.CreateError.SetMsg("用户名或密码错误")
+		return nil, errors.New("用户名或密码错误")
 	}
 
 	//校验密码
 	if util.Md5Encrypt(password+user.Salt) != user.Password {
-		return nil, errcode.CreateError.SetMsg("用户名或密码错误")
+		return nil, errors.New("用户名或密码错误")
 	}
-
 	return user, nil
 }

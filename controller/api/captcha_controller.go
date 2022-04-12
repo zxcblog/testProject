@@ -22,7 +22,7 @@ type CaptchaController struct {
 // @Success      200  {object}  app.Response{data=string}
 // @Router       /captcha [get]
 func (this *CaptchaController) Get() *app.Response {
-	return app.ResponseData(services.CaptchaService.GetCaptchaID(this.Ctx))
+	return app.ResponseData(services.CaptchaService.GetCaptchaID())
 }
 
 // GetBy 通过验证码ID获取到图片
@@ -37,9 +37,9 @@ func (this *CaptchaController) Get() *app.Response {
 func (this *CaptchaController) GetBy(captchaId string) *app.Response {
 	refresh, _ := this.Ctx.URLParamBool("refresh")
 	var content bytes.Buffer
-	err := services.CaptchaService.GetImage(this.Ctx, &content, captchaId, refresh, 200, 50)
+	err := services.CaptchaService.GetImage(&content, captchaId, refresh, 200, 50)
 	if err != nil {
-		return app.ToResponseErr(err)
+		return app.ResponseErrMsg(err.Error())
 	}
 
 	w := this.Ctx.ResponseWriter()

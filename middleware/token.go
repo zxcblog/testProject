@@ -10,7 +10,6 @@ import (
 	"fmt"
 	"github.com/kataras/iris/v12"
 	"new-project/pkg/app"
-	"new-project/pkg/errcode"
 	"strings"
 )
 
@@ -22,7 +21,7 @@ func Token(ctx iris.Context) {
 
 	// 没有上传token时， 让用户登录
 	if strings.TrimSpace(token) == "" {
-		ctx.JSON(app.ToResponseErr(errcode.UnauthorizedAuthNotExist))
+		ctx.JSON(app.UnauthorizedAuthNotExist)
 		ctx.StopExecution()
 	}
 

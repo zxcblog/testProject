@@ -8,7 +8,6 @@ import (
 	"new-project/models/form"
 	"new-project/pkg/app"
 	"new-project/pkg/config"
-	"new-project/pkg/errcode"
 	"new-project/services"
 )
 
@@ -29,13 +28,13 @@ type UploadController struct {
 func (this *UploadController) Post() *app.Response {
 	file, fileHeader, err := this.Ctx.FormFile("file")
 	if err != nil {
-		return app.ToResponseErr(errcode.UploadFileError.SetMsg(err.Error()))
+		return app.UploadFileError.SetMsg(err.Error())
 	}
 	defer file.Close()
 
 	upload, err := services.UploadService.Upload(file, fileHeader)
 	if err != nil {
-		return app.ToResponseErr(err)
+		return app.CreateError.SetMsg(err.Error())
 	}
 	return app.ResponseData(render.BuildUpload(upload))
 }
@@ -60,13 +59,13 @@ type InitiateMultipart struct {
 func (this *UploadController) PostInitiateMultipart() *app.Response {
 	param := &InitiateMultipart{}
 	if err := app.FormValueJson(this.Ctx, global.Validate, param); err != nil {
-		return app.ToResponseErr(err)
+		return err
 	}
 
 	// 对文件进行重命名
 	uploadId, chunkNum, err := services.UploadService.InitialMultipart(param.FileSize, param.FileName, param.FileType)
 	if err != nil {
-		return app.ToResponseErr(err)
+		return app.ResponseErrMsg(err.Error())
 	}
 
 	return app.ResponseData(app.Result{
@@ -91,7 +90,7 @@ func (this *UploadController) PostInitiateMultipart() *app.Response {
 func (this *UploadController) PostPartBy(uploadId string, num int) *app.Response {
 	file, fileHeader, err := this.Ctx.FormFile("file")
 	if err != nil {
-		return app.ToResponseErr(errcode.UploadFileError.SetMsg(err.Error()))
+		return app.UploadFileError.SetMsg(err.Error())
 	}
 	defer file.Close()
 
@@ -102,7 +101,7 @@ func (this *UploadController) PostPartBy(uploadId string, num int) *app.Response
 		File:     file,
 	}
 	if err := services.UploadService.UploadPart(req); err != nil {
-		return app.ToResponseErr(err)
+		return app.ResponseErrMsg(err.Error())
 	}
 	return app.ResponseMsg("上传成功")
 }
@@ -122,7 +121,7 @@ func (this *UploadController) PostCompleteBy(uploadId string) *app.Response {
 	user := &models.User{}
 	user.ID = 6
 	if err := services.UploadService.Complete(uploadId, user.ID); err != nil {
-		return app.ToResponseErr(err)
+		return app.ResponseErrMsg(err.Error())
 	}
 	return app.ResponseMsg("上传成功")
 }

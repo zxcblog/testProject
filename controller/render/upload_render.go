@@ -44,7 +44,7 @@ func BuildUpload(upload *models.Upload) *Upload {
 //	}
 //
 //	for _, brand := range brands {
-//		list = append(list, BuildBrand(brand))
+//		list = end(list, BuildBrand(brand))
 //	}
 //	return list
 //}

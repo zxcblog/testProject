@@ -1,9 +1,9 @@
 package services
 
 import (
+	"errors"
 	"new-project/global"
 	"new-project/models"
-	"new-project/pkg/errcode"
 	"new-project/repositories"
 
 	"go.uber.org/zap"
@@ -21,7 +21,7 @@ func (this *productSkuKeyValueService) Create(productSkuKeyValue *models.Product
 	err := repositories.ProductSkuKeyValueRepositories.Create(global.DB, productSkuKeyValue)
 	if err != nil {
 		global.Logger.Error("商品Sku的key和value添加失败", zap.Error(err))
-		return errcode.CreateError.SetMsg("商品Sku的key和value添加失败")
+		return errors.New("商品Sku的key和value添加失败")
 	}
 	return nil
 }
@@ -30,7 +30,7 @@ func (this *productSkuKeyValueService) BatchCreate(productSkuKeyValue []*models.
 	err := repositories.ProductSkuKeyValueRepositories.BatchCreate(global.DB, productSkuKeyValue)
 	if err != nil {
 		global.Logger.Error("商品Sku的key和value添加失败", zap.Error(err))
-		return errcode.CreateError.SetMsg("商品Sku的key和value添加失败")
+		return errors.New("商品Sku的key和value添加失败")
 	}
 	return nil
 }
