@@ -11,6 +11,8 @@ import (
 	"new-project/global"
 	"new-project/models"
 	"new-project/pkg/app"
+	"new-project/pkg/config"
+	"new-project/services"
 	"time"
 )
 
@@ -24,16 +26,15 @@ type User struct {
 }
 
 func BuildLoginSuccess(user *models.User) *app.Response {
-	//生成Token
-	expire := time.Now().Add(2*time.Hour + 30*time.Second)
-	token, err := app.GenToken(user.Username, expire)
+	issueAt := time.Now()
+	token, err := services.UserTokenService.TokenGenerate(user.Username, issueAt)
 	if err != nil {
 		global.Logger.Error("用户注册生成token失败", zap.Error(err))
 		return app.UnauthorizedTokenGenerate
 	}
 	return app.ResponseData(app.Result{
 		"token":    token,
-		"expire":   expire.Unix(),
+		"expire":   issueAt.Add(config.GetJwtExpire()).Unix(),
 		"duration": 7200,
 		"user":     BuildUser(user),
 	})

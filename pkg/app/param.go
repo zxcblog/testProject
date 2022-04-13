@@ -10,6 +10,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/kataras/iris/v12"
+	"new-project/models"
 	"new-project/pkg/validate"
 	"strconv"
 )
@@ -87,4 +88,13 @@ func FormValueJson(ctx iris.Context, validate *validate.Translations, data inter
 // param error
 func paramError(name string) error {
 	return errors.New(fmt.Sprintf("找不到参数值 '%s'", name))
+}
+
+// GetUser 通过ctx获取到当前登录用户
+func GetUser(ctx iris.Context) (*models.User, *Response) {
+	userI := ctx.Values().Get("user")
+	if user, ok := userI.(*models.User); ok {
+		return user, nil
+	}
+	return nil, UnauthorizedAuthNotExist
 }

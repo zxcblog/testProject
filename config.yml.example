@@ -44,3 +44,7 @@ Oss:
     AccessKeyID:  阿里云oss存储信息
     AccessKeySecret: 阿里云oss存储信息
     BucketName:  阿里云oss存储信息
+
+Jwt:
+  Expire: jwt过期时间， 以小时计算
+  Secret: jwt加密密钥

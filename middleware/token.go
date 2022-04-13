@@ -7,12 +7,11 @@
 package middleware
 
 import (
-	"fmt"
 	"github.com/kataras/iris/v12"
-	"new-project/cache"
+	"net/http"
 	"new-project/pkg/app"
+	"new-project/services"
 	"strings"
-	"time"
 )
 
 func Token(ctx iris.Context) {
@@ -26,21 +25,10 @@ func Token(ctx iris.Context) {
 		ctx.StopWithJSON(401, app.UnauthorizedAuthNotExist)
 	}
 
-	// 验证token是否正确
-	myClaims, err := app.ParseToken(token)
+	// 获取当前正在登录用户
+	user, err := services.UserTokenService.GetTokenUser(token)
 	if err != nil {
-		fmt.Println(err)
-		ctx.StopWithJSON(401, app.UnauthorizedTokenError)
-	}
-
-	if time.Now().Unix() > myClaims.ExpiresAt {
-		ctx.StopWithJSON(401, app.UnauthorizedTokenTimeout)
-	}
-
-	// 获取正在登录中的用户
-	user := cache.UserCache.Get(myClaims.Username)
-	if user == nil {
-		ctx.StopWithJSON(401, app.UnauthorizedAuthNotExist)
+		ctx.StopWithJSON(http.StatusUnauthorized, err)
 	}
 
 	ctx.Values().Set("user", user)
