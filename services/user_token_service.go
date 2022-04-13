@@ -2,7 +2,7 @@ package services
 
 import (
 	"errors"
-	"github.com/golang-jwt/jwt"
+	"github.com/golang-jwt/jwt/v4"
 	"new-project/cache"
 	"new-project/models"
 	"new-project/pkg/app"

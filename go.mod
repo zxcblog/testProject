@@ -5,6 +5,7 @@ go 1.17
 require (
 	github.com/aliyun/aliyun-oss-go-sdk v2.2.2+incompatible // indirect
 	github.com/go-playground/validator/v10 v10.10.0 // indirect
+	github.com/golang-jwt/jwt/v4 v4.4.1 // indirect
 	github.com/iris-contrib/swagger/v12 v12.0.1 // indirect
 	github.com/kataras/iris/v12 v12.2.0-alpha6.0.20220221205027-8ded69fd7ed2 // indirect
 	github.com/natefinch/lumberjack v2.0.0+incompatible // indirect
@@ -31,7 +32,6 @@ require (
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.1 // indirect
 	github.com/dchest/captcha v0.0.0-20200903113550-03f5f0333e1f
-	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/eknkc/amber v0.0.0-20171010120322-cdade1c07385 // indirect
 	github.com/fatih/structs v1.1.0 // indirect
