@@ -65,7 +65,7 @@ func (this *CategoryController) Get() *app.Response {
 	pageSize := app.GetPageSize(this.Ctx)
 	list, total := services.CategoryService.GetListPage(global.DB.Where("category_id", categoryID), page, pageSize)
 
-	return app.ToResponseList(render.BuildCreategories(list), total)
+	return app.ResponseList(render.BuildCreategories(list), total)
 }
 
 // GetBy 通过id获取分类信息

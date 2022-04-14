@@ -7,7 +7,7 @@
 package models
 
 var Models = []interface{}{
-	&Product{}, &User{}, &Category{}, &ProductSku{}, &Brand{}, &Upload{}, &ProductSkuKeyValue{},
+	&Product{}, &User{}, &Category{}, &ProductSku{}, &Brand{}, &Upload{}, &ProductSkuKeyValue{}, &Address{},
 }
 
 // User 用户表
@@ -84,4 +84,18 @@ type Upload struct {
 	NewName  string `gorm:"size:512;comment:新名称"`
 	FileType string `gorm:"size:512;comment:文件类型"`
 	FileExt  string `gorm:"size:512;comment:文件后缀"`
+}
+
+// Address 用户地址管理
+type Address struct {
+	Model
+	IsDefault     bool   `gorm:"type:tinyint(1);default:0;comment:默认地址:1=默认地址"`
+	UserId        uint   `gorm:"index:idx_address_user_id;default:0;comment:用户id"`
+	Province      string `gorm:"size:512;comment:省"`
+	City          string `gorm:"size:512;comment:市"`
+	Area          string `gorm:"size:512;comment:区"`
+	Street        string `gorm:"size:512;comment:街道"`
+	Desc          string `gorm:"size:512;comment:详细地址"`
+	ContactName   string `gorm:"size:512;comment:收货人姓名"`
+	ContactMobile string `gorm:"size:512;comment:收货人电话"`
 }
