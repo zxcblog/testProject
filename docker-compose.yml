@@ -1,0 +1,57 @@
+version: "3.9"
+services:
+  compile:
+    image: golang:1.17-alpine3.15
+    environment:
+      - GO111MODULE=on
+      - GOPROXY=https://goproxy.io,direct
+      - TZ=Asia/Shanghai
+      - GOOS=linux
+      - GOARCH=amd64
+    working_dir: /go/app
+    volumes:
+      - .:/go/app
+    command: go build -ldflags "-s -w" -o main.sh
+
+  server:
+    image: alpine:3.15
+    ports:
+      - "19610:19610"
+    depends_on:
+      - redis
+      - mysql
+    working_dir: /app
+    volumes:
+      - .:/app
+    restart: always
+    links:
+      - redis
+      - mysql
+    command:
+      - ./main.sh
+
+  redis:
+    image: redis:6-alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./docker/services/redis/redis-6.conf:/etc/redis.conf:ro
+      - ./docker/data/redis:/data/:rw
+    restart: always
+    entrypoint: [ "redis-server", "/etc/redis.conf" ]
+    environment:
+      TZ: "Asia/Shanghai"
+  mysql:
+    image: mysql:8.0
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./docker/services/mysql/mysql.cnf:/etc/mysql/conf.d/mysql.cnf:ro
+      - ./docker/data/mysql:/var/lib/mysql/:rw
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: "123456"
+      MYSQL_DATABASE: "shop"
+      TZ: "Asia/Shanghai"
+
