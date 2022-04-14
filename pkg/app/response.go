@@ -34,7 +34,7 @@ func ToResponse(msg string, data interface{}) *Response {
 	return &Response{Code: Success.Code, Data: data, Msg: msg}
 }
 
-func ToResponseList(list interface{}, totalRows int64) *Response {
+func ResponseList(list interface{}, totalRows int64) *Response {
 	return ToResponse("", Result{
 		"list":      list,
 		"totalRows": totalRows,

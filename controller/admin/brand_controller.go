@@ -65,7 +65,7 @@ func (b *BrandController) Get() *app.Response {
 	pageSize := app.GetPageSize(b.Ctx)
 	list, total := services.BrandService.GetListPage(categoryID, page, pageSize)
 
-	return app.ToResponseList(render.BuildBrands(list), total)
+	return app.ResponseList(render.BuildBrands(list), total)
 }
 
 // GetBy 通过id获取品牌信息

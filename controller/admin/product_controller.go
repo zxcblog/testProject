@@ -155,5 +155,5 @@ func (this *ProductController) Get() *app.Response {
 	pageSize := app.GetPageSize(this.Ctx)
 
 	list, total := services.ProductService.GetListPage(whereParams, page, pageSize)
-	return app.ToResponseList(render.BuildProductList(list), total)
+	return app.ResponseList(render.BuildProductList(list), total)
 }
