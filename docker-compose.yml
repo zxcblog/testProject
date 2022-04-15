@@ -1,57 +1,134 @@
 version: "3.9"
 services:
-  compile:
-    image: golang:1.17-alpine3.15
-    environment:
-      - GO111MODULE=on
-      - GOPROXY=https://goproxy.io,direct
-      - TZ=Asia/Shanghai
-      - GOOS=linux
-      - GOARCH=amd64
-    working_dir: /go/app
-    volumes:
-      - .:/go/app
-    command: go build -ldflags "-s -w" -o main.sh
+#  compile:
+#    image: golang:1.17-alpine3.15
+#    environment:
+#      - GO111MODULE=on
+#      - GOPROXY=https://goproxy.io,direct
+#      - TZ=Asia/Shanghai
+#      - GOOS=linux
+#      - GOARCH=amd64
+#    working_dir: /go/app
+#    volumes:
+#      - .:/go/app
+#    command: go build -ldflags "-s -w" -o main.sh
+#
+#  server:
+#    image: alpine:3.15
+#    ports:
+#      - "19610:19610"
+#    depends_on:
+#      - redis
+#      - mysql
+#    working_dir: /app
+#    volumes:
+#      - .:/app
+#    restart: always
+#    links:
+#      - redis
+#      - mysql
+#    command:
+#      - ./main.sh
+#    networks:
+#      - test_project
+#
+#  redis:
+#    image: redis:6-alpine
+#    container_name: testProjectRedis
+#    ports:
+#      - "6379:6379"
+#    volumes:
+#      - ./docker/services/redis/redis-6.conf:/etc/redis.conf:ro
+#      - ./docker/data/redis:/data/:rw
+#    restart: always
+#    entrypoint: [ "redis-server", "/etc/redis.conf" ]
+#    environment:
+#      TZ: "Asia/Shanghai"
+#    networks:
+#      - test_project
+#
+#  mysql:
+#    image: mysql:8.0
+#    container_name: testProjectMysql
+#    ports:
+#      - "3306:3306"
+#    volumes:
+#      - ./docker/services/mysql/mysql.cnf:/etc/mysql/conf.d/mysql.cnf:ro
+#      - ./docker/data/mysql:/var/lib/mysql/:rw
+#    restart: always
+#    environment:
+#      MYSQL_ROOT_PASSWORD: "123456"
+#      MYSQL_DATABASE: "shop"
+#      TZ: "Asia/Shanghai"
+#    networks:
+#      - test_project
 
-  server:
-    image: alpine:3.15
+  cerebro:
+    image: lmenezes/cerebro:0.8.3
+    container_name: testProjectCerebro
     ports:
-      - "19610:19610"
-    depends_on:
-      - redis
-      - mysql
-    working_dir: /app
-    volumes:
-      - .:/app
-    restart: always
-    links:
-      - redis
-      - mysql
+      - "9000:9000"
     command:
-      - ./main.sh
+      -Dhosts.0.host=http://elasticsearch:9200
+    networks:
+      - test_project
 
-  redis:
-    image: redis:6-alpine
-    container_name: redis
-    ports:
-      - "6379:6379"
+  elasticsearch:
+    image: elasticsearch:7.17.2
+    container_name: testProjectES
     volumes:
-      - ./docker/services/redis/redis-6.conf:/etc/redis.conf:ro
-      - ./docker/data/redis:/data/:rw
-    restart: always
-    entrypoint: [ "redis-server", "/etc/redis.conf" ]
-    environment:
-      TZ: "Asia/Shanghai"
-  mysql:
-    image: mysql:8.0
+      - ./docker/data/elasticsearch1:/usr/share/elasticsearch/data:z
     ports:
-      - "3306:3306"
-    volumes:
-      - ./docker/services/mysql/mysql.cnf:/etc/mysql/conf.d/mysql.cnf:ro
-      - ./docker/data/mysql:/var/lib/mysql/:rw
-    restart: always
+      - "9200:9200"
     environment:
-      MYSQL_ROOT_PASSWORD: "123456"
-      MYSQL_DATABASE: "shop"
-      TZ: "Asia/Shanghai"
+      - cluster.name=geektime
+      - node.name=testProjectES
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - discovery.seed_hosts=testProjectES,testProjectES2
+      - cluster.initial_master_nodes=testProjectES,testProjectES2
+      - TZ="Asia/Shanghai"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    networks:
+      - test_project
 
+  elasticsearch2:
+    image: elasticsearch:7.17.2
+    container_name: testProjectES2
+    volumes:
+      - ./docker/data/elasticsearch2:/usr/share/elasticsearch/data:z
+    environment:
+      - cluster.name=geektime
+      - node.name=testProjectES2
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - discovery.seed_hosts=testProjectES,testProjectES2
+      - cluster.initial_master_nodes=testProjectES,testProjectES2
+      - TZ="Asia/Shanghai"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    networks:
+      - test_project
+
+
+  kibana:
+    image: kibana:7.17.2
+    container_name: testProjectKibana
+    ports:
+      - "5601:5601"
+    environment:
+      #- I18N_LOCALE=zh-CN
+      - XPACK_GRAPH_ENABLED=true
+      - TIMELION_ENABLED=true
+      - XPACK_MONITORING_COLLECTION_ENABLED="true"
+    networks:
+      - test_project
+
+networks:
+  test_project:
+    driver: bridge
